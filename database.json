@@ -1,0 +1,26 @@
+{
+  "Websites" : {
+    "Google":  {
+      "url":  "https://www.google.com/",
+      "username": "example@outlook.com",
+      "password": "pass1234"
+    },
+    "Facebook":  {
+      "url":  "https://www.facebook.com/",
+      "username": "example@outlook.com",
+      "password": "pass1234fb"
+    },
+    "Twitter" : {
+      "url":  "https://www.twitter.com/",
+      "username": "example@outlook.com",
+      "password": "r43rfsffdsfdsf"
+    }
+  },
+  "Bank Accounts": {
+    "Starling": {
+      "Name": "Mr John Doe",
+      "Account Number": "12345678",
+      "Sort Code": "12-34-56"
+    }
+  }
+}

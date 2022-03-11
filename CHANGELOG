@@ -1,0 +1,46 @@
+// -----------------------------------------------------
+// CSC371 Advanced Object Oriented Programming (2021/22)
+// Department of Computer Science, Swansea University
+//
+// Author: Martin Porcheron
+//         m.a.w.porcheron@swansea.ac.uk
+//
+// Canvas: https://canvas.swansea.ac.uk/courses/24793
+// -----------------------------------------------------
+// 371pass Coursework — Changelog
+// -----------------------------------------------------
+
+
+Releases
+--------
+v1.1.2  Worksheet and wallet.cpp updated          6th Mar 2022
+v1.1.1  Missing comments for size() and empty()   3rd Mar 2022
+v1.1    Update test2.cpp                          3rd Mar 2022
+v1.0.1  Minor fixes to framework and worksheet    3rd Mar 2022
+v1.0    Initial coursework release                28th Feb 2022
+
+v1.1.2 - 6th Mar 2022
+---------------------
+--database argument should be --db in the worksheet (Thanks Rob Wealthall)
+Wallet::deleteEntry() should be Wallet::deleteCategory() (Thanks Ali Kellaway)
+
+v1.1.1 - 3rd Mar 2022
+---------------------
+Add missing comments for size() and empty() to Item and Category (Thanks Ali Kellaway)
+
+v1.1 - 3rd Mar 2022
+-------------------
+Update test2.cpp to correctly not expect an exception (Thanks Samuel Roach)
+
+v1.0.1 — 3rd Mar 2022
+---------------------
+Minor fixes to framework and worksheet:
+ - Clarify student ID only needs to be in editable .cpp/.h files
+ - Update Catch2 framework
+ - Remove erroneous semicolon from 371pass.h
+ - Fix building with build.bat (Windows only)
+
+v1.0 — 28th Feb 2022
+--------------------
+Coursework released
+
