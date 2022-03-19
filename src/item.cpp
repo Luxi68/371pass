@@ -9,6 +9,8 @@
 
 #include <string>
 #include <map>
+// #include <iostream>
+#include <sstream>
 #include "item.h"
 
 // TODO Write a constructor that takes one parameter, a string identifier
@@ -86,7 +88,7 @@ bool Item::addEntry(std::string key, std::string value) {
     }
 
     this -> entries.insert (std::pair<std::string, std::string>(key, value));
-
+    // std::cout << key << " has been added to " << this -> getIdent() << std::endl;
     return !isFound;
 }
 
@@ -167,3 +169,19 @@ bool operator==(const Item item1, const Item item2) {
 // Example:
 //  Item iObj{"itemIdent"};
 //  std::string s = iObj.str();
+std::string Item::str() const {
+    std::stringstream sstr;
+    
+    sstr << "{" ;
+    for (auto itr = entries.begin(); itr != entries.end(); ++itr){
+        sstr << "\"" << itr -> first << "\""
+             << ":\"" << itr -> second << "\"";
+        
+        if(++itr != entries.end()) {
+            sstr << ",";
+        }
+    }
+    sstr << "}";
+
+    return sstr.str();
+}

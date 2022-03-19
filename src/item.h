@@ -38,6 +38,7 @@ class Item {
 
         Item mergeItem(Item newItem) const;
         friend bool operator==(const Item item1, const Item item2);
+        std::string str() const;
 };
 
 #endif // ITEM_H

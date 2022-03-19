@@ -10,6 +10,8 @@
 #include <string>
 #include <list>
 #include <stdexcept>
+// #include <iostream>
+#include <sstream>
 #include "item.h"
 #include "category.h"
 
@@ -54,6 +56,9 @@ bool Category::empty() {
 // Example:
 //  Category cObj{"categoryIdent"};
 //  auto ident = cObj.getIdent();
+std::string Category::getIdent() const {
+    return this -> ident;
+}
 
 // TODO Write a function, setIdent, that takes one parameter, a string for a new
 //  Category identifier, and updates the member variable. It returns nothing.
@@ -82,21 +87,24 @@ bool Category::empty() {
 //  Item iObj{"itemIdent"};
 //  cObj.addItem(iObj);
 bool Category::addItem(Item newItem) {
+    bool isFound = false;
+
     for (auto const& item : items) {
         if(item.getIdent() == newItem.getIdent()) {
+            isFound = true;
+
             if (item == newItem) {
-                return false;
+                return !isFound;
             }
 
             newItem = newItem.mergeItem(item);
+            // std::cout << newItem.getIdent() << " has been added to " << this -> getIdent() << std::endl;
             items.remove(item);
-            items.push_back(newItem);
-            return false;
         }
     }
 
     items.push_back(newItem);
-    return true;
+    return !isFound;
 }
 
 // TODO Write a function, getItem, that takes one parameter, an Item
@@ -114,6 +122,7 @@ Item Category::getItem(std::string itemIdent) const {
     for (auto const& item : items) {
         if(item.getIdent() == itemIdent) {
             return item;
+            // std::cout << itemIdent << " has been gotten from " << this -> getIdent() << std::endl;
         }
     }
 
@@ -139,6 +148,22 @@ bool Category::deleteItem(std::string itemIdent) {
     throw std::out_of_range("deleteItem failed, no item found for itemIdent: " + itemIdent);
 }
 
+// A function which takes a category with the same ident value and
+//  merges it with this (new) category. For any entries with the same key,
+//  the new category takes priority. Returns the merged category object
+//
+// Example:
+//  Item iObj1{"identIdent"};
+//  iObj1.addEntry("key", "value");
+//  Item iObj2{"identIdent"};
+//  Item iObj3 = iObj2.merge(iObj1);
+Category Category::mergeCategory(Category oldCategory) const {
+    for (auto const& item : items) {
+        oldCategory.addItem(item);
+    }
+    return oldCategory;
+}
+
 // TODO Write an == operator overload for the Category class, such that two
 //  Category objects are equal only if they have the same identifier and same
 //  Items.
@@ -150,6 +175,9 @@ bool Category::deleteItem(std::string itemIdent) {
 //  if(cObj1 == cObj2) {
 //    ...
 //  }
+bool operator==(const Category category1, const Category category2) {
+    return (category1.getIdent() == category2.getIdent()) && (category1.items == category2.items);
+}
 
 // TODO Write a function, str, that takes no parameters and returns a
 //  std::string of the JSON representation of the data in the Category.
@@ -159,3 +187,19 @@ bool Category::deleteItem(std::string itemIdent) {
 // Example:
 //  Category cObj{"categoryIdent"};
 //  std::string s = cObj.str();
+std::string Category::str() const {
+    std::stringstream sstr;
+    
+    sstr << "{" ;
+    for (auto itr = items.begin(); itr != items.end(); ++itr){
+        sstr << "\"" << itr -> getIdent() << "\":"
+             << itr -> str();
+        
+        if(++itr != items.end()) {
+            sstr << ",";
+        }
+    }
+    sstr << "}";
+
+    return sstr.str();
+}

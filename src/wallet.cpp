@@ -7,13 +7,24 @@
 // Canvas: https://canvas.swansea.ac.uk/courses/24793
 // -----------------------------------------------------
 
+// #include <iostream>
+#include <fstream>
+#include <sstream>
+#include "lib_json.hpp"
 #include "wallet.h"
+#include "category.h"
+#include "item.h"
 
 // TODO Write a Wallet constructor that takes no parameters and constructs an
 //  empty wallet.
 //
 // Example:
 //  Wallet wObj{};
+Wallet::Wallet() {
+    std::list<Category> categories;
+}
+
+Wallet::~Wallet() {}
 
 // TODO Write a function, size, that takes no parameters and returns an unsigned
 //  int of the number of categories in the Wallet contains.
@@ -21,6 +32,9 @@
 // Example:
 //  Wallet wObj{};
 //  auto size = wObj.size();
+unsigned int Wallet::size() {
+    return this -> categories.size();
+}
 
 // TODO Write a function, empty, that takes no parameters and returns true
 //  if the number of categories in the Wallet is zero, false otherwise.
@@ -28,6 +42,12 @@
 // Example:
 //  Wallet wwObj{};
 //  auto isEmpty = wObj.empty();
+bool Wallet::empty() {
+    if (this -> categories.size() == 0) {
+        return true;
+    }
+    return false;
+}
 
 // TODO Write a function, newCategory, that takes one parameter, a category
 //  identifier, and returns the Category object as a reference. If an object
@@ -49,6 +69,33 @@
 //  Wallet wObj{};
 //  Category cObj{"categoryIdent"};
 //  wObj.addCategory(cObj);
+bool Wallet::addCategory(Category newCategory) {
+    bool isFound = false;
+
+    for (auto const& category : categories) {
+        if(category.getIdent() == newCategory.getIdent()) {
+            isFound = true;
+
+            if (category == newCategory) {
+                return !isFound;
+            }
+
+            newCategory = newCategory.mergeCategory(category);
+
+            // BUG Category may sometimes fail to push but still cause another to be removed
+            categories.remove(category);
+        }
+    }
+
+    try {
+        categories.push_back(newCategory);
+        // std::cout << newCategory.getIdent() << " has been added to wallet" << std::endl;
+    } catch (std::length_error const&) { 
+        throw std::runtime_error("Could not add category: " + newCategory.getIdent());
+    }
+    
+    return !isFound;
+}
 
 // TODO Write a function, getCategory, that takes one parameter, a Category
 //  identifier and returns the Category. If no Category exists, throw an
@@ -58,6 +105,18 @@
 //  Wallet wObj{};
 //  wObj.newCategory("categoryIdent");
 //  auto cObj = wObj.getCategory("categoryIdent");
+Category Wallet::getCategory(std::string categoryIdent) const {
+    for (auto const& category : categories) {
+        if(category.getIdent() == categoryIdent) {
+            return category;
+            // std::cout << categoryIdent << " has been gotten" << std::endl;
+        }
+    }
+
+    throw std::out_of_range(
+        "getCategory failed, no category found for categoryIdent: " 
+        + categoryIdent);
+}
 
 // TODO Write a function, deleteCategory, that takes one parameter, a Category
 //  identifier, and deletes it from the container, and returns true if the
@@ -67,6 +126,18 @@
 //  Wallet wObj{};
 //  wObj.newCategory("categoryIdent");
 //  wObj.deleteCategory("categoryIdent");
+bool Wallet::deleteCategory(std::string categoryIdent) {
+    for (auto const& category : categories) {
+        if(category.getIdent() == categoryIdent) {
+            categories.remove(category);
+            return true;
+        }
+    }
+
+    throw std::out_of_range(
+        "deleteCategory failed, no category found for categoryIdent: " 
+        + categoryIdent);
+}
 
 // TODO Write a function, load, that takes one parameter, a std::string,
 //  containing the filename for the database. Open the file, read the contents,
@@ -127,6 +198,26 @@
 // Example:
 //  Wallet wObj{};
 //  wObj.load("database.json");
+void Wallet::load(const std::string filename){
+    std::ifstream ifs(filename);
+    nlohmann::json jf = nlohmann::json::parse(ifs);
+
+    for(auto i = jf.begin(); i != jf.end(); ++i) {
+        Category cObj{i.key()};
+
+        for(auto j = i.value().begin(); j != i.value().end(); ++j) {
+            Item iObj{j.key()};
+
+            for(auto k = j.value().begin(); k != j.value().end(); ++k) {
+                iObj.addEntry(k.key(), k.value());
+            }
+
+            cObj.addItem(iObj);
+        }
+        
+        this -> addCategory(cObj);
+    }
+}
 
 // TODO Write a function ,save, that takes one parameter, the path of the file
 //  to write the database to. The function should serialise the Wallet object
@@ -157,3 +248,19 @@
 // Example:
 //  Wallet wObj{};
 //  std::string s = wObj.str();
+std::string Wallet::str() const {
+    std::stringstream sstr;
+    
+    sstr << "{" ;
+    for (auto itr = categories.begin(); itr != categories.end(); ++itr){
+        sstr << "\"" << itr -> getIdent() << "\":"
+             << itr -> str();
+        
+        if(++itr != categories.end()) {
+            sstr << ",";
+        }
+    }
+    sstr << "}";
+
+    return sstr.str();
+}

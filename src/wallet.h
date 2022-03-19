@@ -14,8 +14,26 @@
 #ifndef WALLET_H
 #define WALLET_H
 
+#include <list>
+#include "category.h"
+
 class Wallet {
-  
+    private:
+        std::list<Category> categories;
+
+    public:
+        Wallet();
+        ~Wallet();
+
+        unsigned int size();
+        bool empty();
+
+        bool addCategory(Category category);
+        Category getCategory(std::string categoryIdent) const;
+        bool deleteCategory(std::string categoryIdent);
+
+        void load(const std::string filename);
+        std::string str() const;
 };
 
 #endif // WALLET_H

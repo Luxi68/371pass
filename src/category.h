@@ -28,9 +28,15 @@ class Category {
         unsigned int size();
         bool empty();
 
+        std::string getIdent() const;
+
         bool addItem(Item item);
         Item getItem(std::string itemIdent) const;
         bool deleteItem(std::string itemIdent);
+
+        Category mergeCategory(Category oldCategory) const;
+        friend bool operator==(const Category category1, const Category category2);
+        std::string str() const;
 };
 
 #endif // CATEGORY_H
