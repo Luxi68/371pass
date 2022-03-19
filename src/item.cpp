@@ -76,12 +76,18 @@ std::string Item::getIdent() const {
 // Example:
 //  Item iObj{"identIdent"};
 //  iObj.addEntry("key", "value");
-// CHECK if stuff is being replaced if the entry already exists
 bool Item::addEntry(std::string key, std::string value) {
-    std::pair<std::map<std::string, std::string>::iterator, bool> returnValue;
-    returnValue = this -> entries.insert (std::pair<std::string, std::string>(key, value));
+    bool isFound = false;
+    auto itr = this -> entries.find(key);
 
-    return returnValue.second;
+    if (itr != this -> entries.end()) {
+        entries.erase(key);
+        isFound = true;
+    }
+
+    this -> entries.insert (std::pair<std::string, std::string>(key, value));
+
+    return !isFound;
 }
 
 // TODO Write a function, getEntry, that takes one parameter, an entry
