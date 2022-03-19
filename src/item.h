@@ -17,7 +17,20 @@
 #define ITEM_H
 
 class Item {
+    private:
+        std::string ident;
+        std::map<std::string, std::string> entries;
 
+    public:
+        Item(const std::string ident);
+        ~Item();
+
+        unsigned int size();
+        bool empty();
+
+        bool addEntry(std::string key, std::string value);
+        std::string getEntry(std::string key);
+        bool deleteEntry(std::string key);
 };
 
 #endif // ITEM_H

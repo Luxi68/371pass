@@ -7,6 +7,8 @@
 // Canvas: https://canvas.swansea.ac.uk/courses/24793
 // -----------------------------------------------------
 
+#include <string>
+#include <map>
 #include "item.h"
 
 // TODO Write a constructor that takes one parameter, a string identifier
@@ -14,6 +16,12 @@
 //
 // Example:
 //  Item iObj{"identIdent"};
+Item::Item(const std::string ident) {
+    this -> ident = ident;
+    std::map<std::string, std::string> entries;
+}
+
+Item::~Item() {}
 
 // TODO Write a function, size, that takes no parameters and returns an unsigned
 //  int of the number of entries in the Item contains.
@@ -21,6 +29,9 @@
 // Example:
 //  Item iObj{"identIdent"};
 //  auto size = iObj.size();
+unsigned int Item::size() {
+    return this -> entries.size();
+}
 
 // TODO Write a function, empty, that takes no parameters and returns true
 //  if the number of entries in the Item is zero, false otherwise.
@@ -28,6 +39,12 @@
 // Example:
 //  Item iObj{"identIdent"};
 //  auto empty = iObj.empty();
+bool Item::empty() {
+    if (this -> entries.size() == 0) {
+        return true;
+    }
+    return false;
+}
 
 // TODO Write a function, setIdent, that takes one parameter, a string for a new
 //  Item identifier, and updates the member variable. It returns nothing.
@@ -56,6 +73,12 @@
 // Example:
 //  Item iObj{"identIdent"};
 //  iObj.addEntry("key", "value");
+bool Item::addEntry(std::string key, std::string value) {
+    std::pair<std::map<std::string, std::string>::iterator, bool> returnValue;
+    returnValue = this -> entries.insert (std::pair<std::string, std::string>(key, value));
+
+    return returnValue.second;
+}
 
 // TODO Write a function, getEntry, that takes one parameter, an entry
 //  key and returns it's value. If no entry exists, throw an appropriate
@@ -65,6 +88,16 @@
 //  Item iObj{"identIdent"};
 //  iObj.addEntry("key", "value");
 //  auto value = iObj.getEntry("key");
+std::string Item::getEntry(std::string key) {
+    std::map<std::string, std::string>::iterator itr;
+    itr = this -> entries.find(key);
+
+    if (itr != this -> entries.end()) {
+        return itr -> second;
+    } else {
+        throw std::out_of_range("No entry found for key: " + key);
+    }
+}
 
 // TODO Write a function, deleteEntry, that takes one parameter, an entry
 //  key, deletes it from the container, and returns true if the Item was
@@ -74,6 +107,17 @@
 //  Item iObj{"identIdent"};
 //  iObj.addEntry("key", "value");
 //  iObj.deleteEntry("key");
+bool Item::deleteEntry(std::string key) {
+    std::map<std::string, std::string>::iterator itr;
+    itr = this -> entries.find(key);
+
+    if (itr != this -> entries.end()) {
+        this -> entries.erase(itr);
+        return true;
+    } else {
+        throw std::out_of_range("No entry found for key: " + key);
+    }
+}
 
 // TODO Write an == operator overload for the Item class, such that two
 //  Item objects are equal only if they have the same identifier and same
