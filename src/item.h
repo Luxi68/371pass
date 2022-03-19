@@ -16,6 +16,8 @@
 #ifndef ITEM_H
 #define ITEM_H
 
+#include <map>
+
 class Item {
     private:
         std::string ident;
@@ -27,10 +29,15 @@ class Item {
 
         unsigned int size();
         bool empty();
-
+        
+        std::string getIdent() const;
+        
         bool addEntry(std::string key, std::string value);
-        std::string getEntry(std::string key);
+        std::string getEntry(std::string key) const;
         bool deleteEntry(std::string key);
+
+        Item mergeItem(Item newItem) const;
+        friend bool operator==(const Item item1, const Item item2);
 };
 
 #endif // ITEM_H

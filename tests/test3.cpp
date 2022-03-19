@@ -22,6 +22,7 @@
 #include "../src/lib_cxxopts_argv.hpp"
 
 #include "../src/category.h"
+#include "../src/item.h"
 
 SCENARIO("An empty Category can be constructed successfully", "[category]") {
 

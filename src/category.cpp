@@ -7,6 +7,10 @@
 // Canvas: https://canvas.swansea.ac.uk/courses/24793
 // -----------------------------------------------------
 
+#include <string>
+#include <list>
+#include <stdexcept>
+#include "item.h"
 #include "category.h"
 
 // TODO Write a constructor that takes one parameter, a string identifier
@@ -14,6 +18,12 @@
 //
 // Example:
 //  Category c{"categoryIdent"};
+Category::Category(const std::string ident) {
+    this -> ident = ident;
+    std::list<Item> items;
+}
+
+Category::~Category() {}
 
 // TODO Write a function, size, that takes no parameters and returns an unsigned
 //  int of the number of Items in the Category contains.
@@ -21,6 +31,9 @@
 // Example:
 //  Category c{"categoryIdent"};
 //  auto size = c.size();
+unsigned int Category::size() {
+    return this -> items.size();
+}
 
 // TODO Write a function, empty, that takes no parameters and returns true
 //  if the number of Items in the Category is zero, false otherwise.
@@ -28,6 +41,12 @@
 // Example:
 //  Category c{"categoryIdent"};
 //  auto empty = c.empty();
+bool Category::empty() {
+    if (this -> items.size() == 0) {
+        return true;
+    }
+    return false;
+}
 
 // TODO Write a function, getIdent, that returns the identifier for the
 //  Category.
@@ -62,6 +81,23 @@
 //  Category cObj{"categoryIdent"};
 //  Item iObj{"itemIdent"};
 //  cObj.addItem(iObj);
+bool Category::addItem(Item newItem) {
+    for (auto const& item : items) {
+        if(item.getIdent() == newItem.getIdent()) {
+            if (item == newItem) {
+                return false;
+            }
+
+            newItem = newItem.mergeItem(item);
+            items.remove(item);
+            items.push_back(newItem);
+            return false;
+        }
+    }
+
+    items.push_back(newItem);
+    return true;
+}
 
 // TODO Write a function, getItem, that takes one parameter, an Item
 //  identifier (a string) and returns the Item as a reference. If no Item
@@ -74,6 +110,15 @@
 //  Category cObj{"categoryIdent"};
 //  cObj.newItem("itemIdent");
 //  auto iObj = cObj.getItem("itemIdent");
+Item Category::getItem(std::string itemIdent) const {
+    for (auto const& item : items) {
+        if(item.getIdent() == itemIdent) {
+            return item;
+        }
+    }
+
+    throw std::out_of_range("getItem failed, no item found for itemIdent: " + itemIdent);
+}
 
 // TODO Write a function, deleteItem, that takes one parameter, an Item
 //  identifier (a string), deletes it from the container, and returns true if
@@ -83,6 +128,16 @@
 //  Category cObj{"categoryIdent"};
 //  cObj.newItem("itemIdent");
 //  bool result = cObj.deleteItem("itemIdent");
+bool Category::deleteItem(std::string itemIdent) {
+    for (auto const& item : items) {
+        if(item.getIdent() == itemIdent) {
+            items.remove(item);
+            return true;
+        }
+    }
+
+    throw std::out_of_range("deleteItem failed, no item found for itemIdent: " + itemIdent);
+}
 
 // TODO Write an == operator overload for the Category class, such that two
 //  Category objects are equal only if they have the same identifier and same

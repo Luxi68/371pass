@@ -58,6 +58,9 @@ bool Item::empty() {
 // Example:
 //  Item iObj{"identIdent"};
 //  auto ident = iObj.getIdent();
+std::string Item::getIdent() const {
+    return this -> ident;
+}
 
 // TODO Write a function, setIdent, that takes one parameter, a string for a new
 //  Item identifier, and updates the member variable. It returns nothing.
@@ -73,6 +76,7 @@ bool Item::empty() {
 // Example:
 //  Item iObj{"identIdent"};
 //  iObj.addEntry("key", "value");
+// CHECK if stuff is being replaced if the entry already exists
 bool Item::addEntry(std::string key, std::string value) {
     std::pair<std::map<std::string, std::string>::iterator, bool> returnValue;
     returnValue = this -> entries.insert (std::pair<std::string, std::string>(key, value));
@@ -88,14 +92,13 @@ bool Item::addEntry(std::string key, std::string value) {
 //  Item iObj{"identIdent"};
 //  iObj.addEntry("key", "value");
 //  auto value = iObj.getEntry("key");
-std::string Item::getEntry(std::string key) {
-    std::map<std::string, std::string>::iterator itr;
-    itr = this -> entries.find(key);
+std::string Item::getEntry(std::string key) const {
+    auto itr = this -> entries.find(key);
 
     if (itr != this -> entries.end()) {
         return itr -> second;
     } else {
-        throw std::out_of_range("No entry found for key: " + key);
+        throw std::out_of_range("getEntry failed, no entry found for key: " + key);
     }
 }
 
@@ -108,15 +111,31 @@ std::string Item::getEntry(std::string key) {
 //  iObj.addEntry("key", "value");
 //  iObj.deleteEntry("key");
 bool Item::deleteEntry(std::string key) {
-    std::map<std::string, std::string>::iterator itr;
-    itr = this -> entries.find(key);
+    auto itr = this -> entries.find(key);
 
     if (itr != this -> entries.end()) {
         this -> entries.erase(itr);
         return true;
     } else {
-        throw std::out_of_range("No entry found for key: " + key);
+        throw std::out_of_range("deleteEntry failed, no entry found for key: " + key);
     }
+}
+
+// A function which takes a item with the same ident value and
+//  merges it with this (new) item. For any entries with the same key,
+//  the new item takes priority. Returns the merged item object
+//
+// Example:
+//  Item iObj1{"identIdent"};
+//  iObj1.addEntry("key", "value");
+//  Item iObj2{"identIdent"};
+//  Item iObj3 = iObj2.merge(iObj1);
+Item Item::mergeItem(Item oldItem) const {
+    auto itr = this -> entries.begin();
+    while (itr != this -> entries.end()) {
+        oldItem.addEntry(itr -> first, itr -> second);
+    }
+    return oldItem;
 }
 
 // TODO Write an == operator overload for the Item class, such that two
@@ -130,6 +149,9 @@ bool Item::deleteEntry(std::string key) {
 //  if(iObj1 == iObj2) {
 //    ...
 //  }
+bool operator==(const Item item1, const Item item2) {
+    return (item1.getIdent() == item2.getIdent()) && (item1.entries == item2.entries);
+}
 
 // TODO Write a function, str, that takes no parameters and returns a
 //  std::string of the JSON representation of the data in the Item.

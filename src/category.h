@@ -13,8 +13,24 @@
 #ifndef CATEGORY_H
 #define CATEGORY_H
 
-class Category {
+#include <list>
+#include "item.h"
 
+class Category {
+    private:
+        std::string ident;
+        std::list<Item> items;
+
+    public:
+        Category(const std::string ident);
+        ~Category();
+
+        unsigned int size();
+        bool empty();
+
+        bool addItem(Item item);
+        Item getItem(std::string itemIdent) const;
+        bool deleteItem(std::string itemIdent);
 };
 
 #endif // CATEGORY_H
