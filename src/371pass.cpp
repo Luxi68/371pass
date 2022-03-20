@@ -82,16 +82,9 @@ int App::run(int argc, char *argv[]) {
 			std::cout << getJSON(wObj, category, item, entry) << std::endl;
 			break;
 		}
-		case Objs::MISSCAT:
-			std::cerr << "Error: missing category argument(s)." << std::endl;
-			return 1;
-		
-		case Objs::MISSITE:
-			std::cerr << "Error: missing item argument(s)." << std::endl;
-			return 1;
-
 		default:
-			throw std::runtime_error("Unexpected arguments for read action");
+			std::cerr << "Error: Unexpected arguments for read action." << std::endl;
+			return 1;
 		}
 		break;
 
@@ -184,6 +177,9 @@ App::Action App::parseActionArgument(cxxopts::ParseResult &args) {
 	} catch (cxxopts::option_has_no_value_exception const&) {
 		std::cerr << "Error: missing action argument(s)." << std::endl;
 		throw std::invalid_argument("action");
+	} catch (cxxopts::missing_argument_exception const&) {
+		std::cerr << "Error: missing action argument(s)." << std::endl;
+		exit(1);
 	}
 }
 
@@ -195,18 +191,27 @@ App::Objs App::parseObjsArgument(cxxopts::ParseResult &args){
 	try {args["category"].as<std::string>();
 	} catch (cxxopts::option_has_no_value_exception const&) {
 		hasCategoryInput = false;
+	} catch (cxxopts::missing_argument_exception const&) {
+		std::cerr << "Error: missing category argument(s)." << std::endl;
+		exit(1);
 	}
 
 	bool hasItemInput = true;
 	try {args["item"].as<std::string>();
 	} catch (cxxopts::option_has_no_value_exception const&) {
 		hasItemInput = false;
+	} catch (cxxopts::missing_argument_exception const&) {
+		std::cerr << "Error: missing item argument(s)." << std::endl;
+		exit(1);
 	}
 
 	bool hasEntryInput = true;
 	try {args["entry"].as<std::string>();
 	} catch (cxxopts::option_has_no_value_exception const&) {
 		hasEntryInput = false;
+	} catch (cxxopts::missing_argument_exception const&) {
+		std::cerr << "Error: missing entry argument(s)." << std::endl;
+		exit(1);
 	}
 
 	if(hasCategoryInput) {
@@ -221,7 +226,9 @@ App::Objs App::parseObjsArgument(cxxopts::ParseResult &args){
 		} else {
 			if (hasEntryInput) {
 				// 101
-				return Objs::MISSITE;
+				// return Objs::MISSITE;
+				std::cerr << "Error: missing item argument(s)." << std::endl;
+				exit(1);
 			} else {
 				// 100
 				return Objs::CATEGORY;
@@ -230,11 +237,15 @@ App::Objs App::parseObjsArgument(cxxopts::ParseResult &args){
 	} else {
 		if(hasItemInput) {
 			// 011, 010
-			return Objs::MISSCAT;
+			// return Objs::MISSCAT;
+			std::cerr << "Error: missing category argument(s)." << std::endl;
+			exit(1);
 		} else {
 			if(hasEntryInput) {
 				// 001
-				return Objs::MISSCAT;
+				// return Objs::MISSCAT;
+				std::cerr << "Error: missing category argument(s)." << std::endl;
+				exit(1);
 			} else {
 				//000
 				return Objs::NONE;

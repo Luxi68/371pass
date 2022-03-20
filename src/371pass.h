@@ -41,7 +41,7 @@ const std::string STUDENT_NUMBER = "853761";
 enum Action { CREATE, READ, UPDATE, DELETE };
 // This enum specifies which of the different oject arguments have been
 // parssed successfully or which of the arguments are missing.
-enum Objs { CATEGORY, ITEM, ENTRY, NONE , MISSCAT, MISSITE };
+enum Objs { CATEGORY, ITEM, ENTRY, NONE };
 
 int run(int argc, char *argv[]);
 
