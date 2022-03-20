@@ -36,44 +36,78 @@
 // Example:
 //  int main(int argc, char *argv[]) { return App::run(argc, argv); }
 int App::run(int argc, char *argv[]) {
-  auto options = App::cxxoptsSetup();
-  auto args = options.parse(argc, argv);
+	auto options = App::cxxoptsSetup();
+	auto args = options.parse(argc, argv);
 
-  // Print the help usage if requested
-  if (args.count("help")) {
-    std::cout << options.help() << '\n';
-    return 0;
-  }
+	// Print the help usage if requested
+	if (args.count("help")) {
+		std::cout << options.help() << '\n';
+		return 0;
+	}
 
-  // Open the database and construct the Wallet
-  const std::string db = args["db"].as<std::string>();
-  Wallet wObj{};
-  // Only uncomment this once you have implemented the load function!
-  wObj.load(db);
+	// Open the database and construct the Wallet
+	const std::string db = args["db"].as<std::string>();
+	Wallet wObj{};
+	// Only uncomment this once you have implemented the load function!
+	wObj.load(db);
 
-  const Action a = parseActionArgument(args);
-  switch (a) {
-  case Action::CREATE:
-    throw std::runtime_error("create not implemented");
-    break;
+	const Action a = parseActionArgument(args);
+	const Objs o = parseObjsArgument(args);
+	switch (a) {
+	case Action::CREATE:
+		throw std::runtime_error("create not implemented");
+		break;
 
-  case Action::READ:
-    std::cout << nlohmann::json::parse(getJSON(wObj));
-    break;
+	case Action::READ:
+		switch (o) {
+		case Objs::NONE:
+			std::cout << nlohmann::json::parse(getJSON(wObj)) << std::endl;
+			break;
+			
+		case Objs::CATEGORY: {
+			const std::string category = args["category"].as<std::string>();
+			std::cout << nlohmann::json::parse(getJSON(wObj, category)) << std::endl;
+			break;
+		}
+		case Objs::ITEM: {
+			const std::string category = args["category"].as<std::string>();
+			const std::string item = args["item"].as<std::string>();
+			std::cout << nlohmann::json::parse(getJSON(wObj, category, item)) << std::endl;
+			break;
+		}
+		case Objs::ENTRY: {
+			const std::string category = args["category"].as<std::string>();
+			const std::string item = args["item"].as<std::string>();
+			const std::string entry = args["entry"].as<std::string>();
+			std::cout << getJSON(wObj, category, item, entry) << std::endl;
+			break;
+		}
+		case Objs::MISSCAT:
+			std::cerr << "Error: missing category argument(s)." << std::endl;
+			return 1;
+		
+		case Objs::MISSITE:
+			std::cerr << "Error: missing item argument(s)." << std::endl;
+			return 1;
 
-  case Action::UPDATE:
-    throw std::runtime_error("update not implemented");
-    break;
+		default:
+			throw std::runtime_error("Unexpected arguments for read action");
+		}
+		break;
 
-  case Action::DELETE:
-    throw std::runtime_error("delete not implemented");
-    break;
+	case Action::UPDATE:
+		throw std::runtime_error("update not implemented");
+		break;
 
-  default:
-    throw std::runtime_error("Unknown action not implemented");
-  }
+	case Action::DELETE:
+		throw std::runtime_error("delete not implemented");
+		break;
 
-  return 0;
+	default:
+		throw std::runtime_error("Unknown action not implemented");
+	}
+
+	return 0;
 }
 
 // Create a cxxopts instance. You do not need to modify this function.
@@ -82,40 +116,40 @@ int App::run(int argc, char *argv[]) {
 //  auto options = App::cxxoptsSetup();
 //  auto args = options.parse(argc, argv);
 cxxopts::Options App::cxxoptsSetup() {
-  cxxopts::Options cxxopts("371pass", "Student ID: " + STUDENT_NUMBER + "\n");
+	cxxopts::Options cxxopts("371pass", "Student ID: " + STUDENT_NUMBER + "\n");
 
-  cxxopts.add_options()(
-      "db", "Filename of the 371pass database",
-      cxxopts::value<std::string>()->default_value("database.json"))(
+	cxxopts.add_options()(
+		"db", "Filename of the 371pass database",
+		cxxopts::value<std::string>()->default_value("database.json"))(
 
-      "action", "Action to take, can be: 'create', 'read', 'update', 'delete'.",
-      cxxopts::value<std::string>())(
+		"action", "Action to take, can be: 'create', 'read', 'update', 'delete'.",
+		cxxopts::value<std::string>())(
 
-      "category",
-      "Apply action to a category (e.g., if you want to add a category, set the"
-      " action argument to 'add' and the category argument to your chosen"
-      " category identifier).",
-      cxxopts::value<std::string>())(
+		"category",
+		"Apply action to a category (e.g., if you want to add a category, set the"
+		" action argument to 'add' and the category argument to your chosen"
+		" category identifier).",
+		cxxopts::value<std::string>())(
 
-      "item",
-      "Apply action to an item (e.g., if you want to add an item, set the "
-      "action argument to 'add', the category argument to your chosen category "
-      "identifier and the item argument to the item identifier).",
-      cxxopts::value<std::string>())(
+		"item",
+		"Apply action to an item (e.g., if you want to add an item, set the "
+		"action argument to 'add', the category argument to your chosen category "
+		"identifier and the item argument to the item identifier).",
+		cxxopts::value<std::string>())(
 
-      "entry",
-      "Apply action to an entry (e.g., if you want to add an entry, set the "
-      "action argument to 'add', the category argument to your chosen category "
-      "identifier, the item argument to your chosen item identifier, and the "
-      "entry argument to the string 'key,value'). If there is no comma, an "
-      "empty entry is inserted. If you are simply retrieving an entry, set the "
-      "entry argument to the 'key'. If you are updating an entry key, use a : "
-      "e.g., oldkey:newkey,newvalue.",
-      cxxopts::value<std::string>())(
+		"entry",
+		"Apply action to an entry (e.g., if you want to add an entry, set the "
+		"action argument to 'add', the category argument to your chosen category "
+		"identifier, the item argument to your chosen item identifier, and the "
+		"entry argument to the string 'key,value'). If there is no comma, an "
+		"empty entry is inserted. If you are simply retrieving an entry, set the "
+		"entry argument to the 'key'. If you are updating an entry key, use a : "
+		"e.g., oldkey:newkey,newvalue.",
+		cxxopts::value<std::string>())(
 
-      "h,help", "Print usage.");
+		"h,help", "Print usage.");
 
-  return cxxopts;
+	return cxxopts;
 }
 
 // TODO Rewrite this function so that it works. This function should
@@ -128,23 +162,85 @@ cxxopts::Options App::cxxoptsSetup() {
 //  auto args = options.parse(argc, argv);
 //  App::Action action = parseActionArgument(args);
 App::Action App::parseActionArgument(cxxopts::ParseResult &args) {
-  std::string input = args["action"].as<std::string>();
-  
-  std::for_each(input.begin(), input.end(), [](char &c) {
-    c = ::tolower(c);
-  });
+	try {
+		std::string input = args["action"].as<std::string>();
 
-  if (input == "create") {
-    return Action::CREATE;
-  } else if (input == "read") {
-    return Action::READ;
-  } else if (input == "update") {
-    return Action::UPDATE;
-  } else if (input == "delete") {
-    return Action::DELETE;
-  } else {
-    throw std::invalid_argument("action");
-  }
+		std::for_each(input.begin(), input.end(), [](char &c)
+					{ c = ::tolower(c); });
+
+		if (input == "create") {
+			return Action::CREATE;
+		} else if (input == "read") {
+			return Action::READ;
+		} else if (input == "update") {
+			return Action::UPDATE;
+		} else if (input == "delete") {
+			return Action::DELETE;
+		} else {
+			std::cerr << "Error: invalid action argument(s)." << std::endl;
+			throw std::invalid_argument("action");
+		}
+
+	} catch (cxxopts::option_has_no_value_exception const&) {
+		std::cerr << "Error: missing action argument(s)." << std::endl;
+		throw std::invalid_argument("action");
+	}
+}
+
+// A function which checks the arguments relating to category, item and entry
+// values and converts this into a value from the OBJS enum to determine what
+// specific actions are to be taken.
+App::Objs App::parseObjsArgument(cxxopts::ParseResult &args){
+	bool hasCategoryInput = true;
+	try {args["category"].as<std::string>();
+	} catch (cxxopts::option_has_no_value_exception const&) {
+		hasCategoryInput = false;
+	}
+
+	bool hasItemInput = true;
+	try {args["item"].as<std::string>();
+	} catch (cxxopts::option_has_no_value_exception const&) {
+		hasItemInput = false;
+	}
+
+	bool hasEntryInput = true;
+	try {args["entry"].as<std::string>();
+	} catch (cxxopts::option_has_no_value_exception const&) {
+		hasEntryInput = false;
+	}
+
+	if(hasCategoryInput) {
+		if(hasItemInput) {
+			if(hasEntryInput) {
+				// 111
+				return Objs::ENTRY;
+			} else {
+				// 110
+				return Objs::ITEM;
+			}
+		} else {
+			if (hasEntryInput) {
+				// 101
+				return Objs::MISSITE;
+			} else {
+				// 100
+				return Objs::CATEGORY;
+			}
+		}
+	} else {
+		if(hasItemInput) {
+			// 011, 010
+			return Objs::MISSCAT;
+		} else {
+			if(hasEntryInput) {
+				// 001
+				return Objs::MISSCAT;
+			} else {
+				//000
+				return Objs::NONE;
+			}
+		}
+	}
 }
 
 // TODO Write a function, getJSON, that returns a std::string containing the
@@ -158,9 +254,9 @@ App::Action App::parseActionArgument(cxxopts::ParseResult &args) {
 // Example:
 //  Wallet wObj{};
 //  std::cout << getJSON(wObj);
-std::string App::getJSON(Wallet &wObj) { 
-  // Only uncomment this once you have implemented the functions used!
-  return wObj.str();
+std::string App::getJSON(Wallet &wObj) {
+	// Only uncomment this once you have implemented the functions used!
+	return wObj.str();
 }
 
 // TODO Write a function, getJSON, that returns a std::string containing the
@@ -176,10 +272,14 @@ std::string App::getJSON(Wallet &wObj) {
 //  std::string c = "category argument value";
 //  std::cout << getJSON(wObj, c);
 std::string App::getJSON(Wallet &wObj, const std::string &c) {
-  return "{}";
-  // Only uncomment this once you have implemented the functions used!
-  auto cObj = wObj.getCategory(c);
-  return cObj.str();
+	// Only uncomment this once you have implemented the functions used!
+	try {
+		auto cObj = wObj.getCategory(c);
+		return cObj.str();
+	} catch(std::out_of_range const&) {
+		std::cerr << "Error: invalid category argument(s)." << std::endl;
+		exit(1);
+	}
 }
 
 // TODO Write a function, getJSON, that returns a std::string containing the
@@ -196,12 +296,21 @@ std::string App::getJSON(Wallet &wObj, const std::string &c) {
 //  std::string i = "item argument value";
 //  std::cout << getJSON(wObj, c, i);
 std::string App::getJSON(Wallet &wObj, const std::string &c,
-                         const std::string &i) {
-  return "{}";
-  // Only uncomment this once you have implemented the functions used!
-  auto cObj = wObj.getCategory(c);
-  const auto iObj = cObj.getItem(i);
-  return iObj.str();
+						 const std::string &i) {
+	// Only uncomment this once you have implemented the functions used!
+	try {
+		auto cObj = wObj.getCategory(c);
+		try {
+			auto iObj = cObj.getItem(i);
+			return iObj.str();
+		} catch (std::out_of_range const&) {
+			std::cerr << "Error: invalid item argument(s)." << std::endl;
+			exit(1);
+		}
+	} catch(std::out_of_range const&) {
+		std::cerr << "Error: invalid category argument(s)." << std::endl;
+		exit(1);
+	}
 }
 
 // TODO Write a function, getJSON, that returns a std::string containing the
@@ -219,10 +328,24 @@ std::string App::getJSON(Wallet &wObj, const std::string &c,
 //  std::string e = "entry argument value";
 //  std::cout << getJSON(wObj, c, i, e);
 std::string App::getJSON(Wallet &wObj, const std::string &c,
-                         const std::string &i, const std::string &e) {
-  return "{}";
-  // Only uncomment this once you have implemented the functions used!
-  auto cObj = wObj.getCategory(c);
-  auto iObj = cObj.getItem(i);
-  return iObj.getEntry(e);
+						 const std::string &i, const std::string &e) {
+	// Only uncomment this once you have implemented the functions used!
+	try {
+		auto cObj = wObj.getCategory(c);
+		try {
+			auto iObj = cObj.getItem(i);
+			try {
+				return iObj.getEntry(e);
+			} catch(std::out_of_range const&) {
+				std::cerr << "Error: invalid entry argument(s)." << std::endl;
+				exit(1);
+			}
+		} catch (std::out_of_range const&) {
+			std::cerr << "Error: invalid item argument(s)." << std::endl;
+			exit(1);
+		}
+	} catch(std::out_of_range const&) {
+		std::cerr << "Error: invalid category argument(s)." << std::endl;
+		exit(1);
+	}
 }

@@ -39,12 +39,16 @@ const std::string STUDENT_NUMBER = "853761";
 // This enum specifies the four different values we support in the action
 // program argument.
 enum Action { CREATE, READ, UPDATE, DELETE };
+// This enum specifies which of the different oject arguments have been
+// parssed successfully or which of the arguments are missing.
+enum Objs { CATEGORY, ITEM, ENTRY, NONE , MISSCAT, MISSITE };
 
 int run(int argc, char *argv[]);
 
 cxxopts::Options cxxoptsSetup();
 
 App::Action parseActionArgument(cxxopts::ParseResult &args);
+App::Objs parseObjsArgument(cxxopts::ParseResult &args);
 
 std::string getJSON(Wallet &w);
 std::string getJSON(Wallet &w, const std::string &c);
