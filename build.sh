@@ -30,5 +30,5 @@ fi
 
 mkdir -p ${BIN_DIR}
 rm ${EXECUTABLE} 2> /dev/null
-# g++ --std=c++14 -pedantic -Wall ${SOURCE_FILES} ${MAIN_FILE} -o ${EXECUTABLE}
-g++ --std=c++14 -pedantic -Wall -Wextra -Wunreachable-code  ${SOURCE_FILES} ${MAIN_FILE} -o ${EXECUTABLE}
+g++ --std=c++14 -pedantic -Wall ${SOURCE_FILES} ${MAIN_FILE} -o ${EXECUTABLE}
+# g++ --std=c++14 -pedantic -Wall -Wextra -Wunreachable-code  ${SOURCE_FILES} ${MAIN_FILE} -o ${EXECUTABLE}
