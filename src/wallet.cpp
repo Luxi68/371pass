@@ -7,7 +7,7 @@
 // Canvas: https://canvas.swansea.ac.uk/courses/24793
 // -----------------------------------------------------
 
-// #include <iostream>
+#include <iostream>
 #include <fstream>
 #include <sstream>
 #include "lib_json.hpp"
@@ -200,9 +200,9 @@ bool Wallet::deleteCategory(std::string categoryIdent) {
 //  wObj.load("database.json");
 void Wallet::load(const std::string filename){
     std::ifstream ifs(filename);
-    nlohmann::json jf = nlohmann::json::parse(ifs);
+    nlohmann::json jsonFile = nlohmann::json::parse(ifs);
 
-    for(auto i = jf.begin(); i != jf.end(); ++i) {
+    for(auto i = jsonFile.begin(); i != jsonFile.end(); ++i) {
         Category cObj{i.key()};
 
         for(auto j = i.value().begin(); j != i.value().end(); ++j) {
@@ -228,6 +228,14 @@ void Wallet::load(const std::string filename){
 //  wObj.load("database.json");
 //  ...
 //  wObj.save("database.json");
+void Wallet::save(std::string filepath) const {
+    nlohmann::json jsonFile;
+
+    jsonFile = nlohmann::json::parse(this -> str());
+
+    std::ofstream file(filepath);
+    file << jsonFile;
+}
 
 // TODO Write an == operator overload for the Wallet class, such that two
 //  Wallet objects are equal only if they have the exact same data.
@@ -250,14 +258,15 @@ void Wallet::load(const std::string filename){
 //  std::string s = wObj.str();
 std::string Wallet::str() const {
     std::stringstream sstr;
+    long unsigned int counter = 1;
     
     sstr << "{" ;
     for (auto itr = categories.begin(); itr != categories.end(); ++itr){
-        sstr << "\"" << itr -> getIdent() << "\":"
-             << itr -> str();
+        sstr << "\"" << itr -> getIdent() << "\":" << itr -> str();
         
-        if(++itr != categories.end()) {
+        if(counter != categories.size()) {
             sstr << ",";
+            counter++;
         }
     }
     sstr << "}";

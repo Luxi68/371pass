@@ -189,14 +189,15 @@ bool operator==(const Category category1, const Category category2) {
 //  std::string s = cObj.str();
 std::string Category::str() const {
     std::stringstream sstr;
-    
+    long unsigned int counter = 1;
+
     sstr << "{" ;
     for (auto itr = items.begin(); itr != items.end(); ++itr){
-        sstr << "\"" << itr -> getIdent() << "\":"
-             << itr -> str();
+        sstr << "\"" << itr -> getIdent() << "\":" << itr -> str();
         
-        if(++itr != items.end()) {
+        if(counter != items.size()) {
             sstr << ",";
+            counter++;
         }
     }
     sstr << "}";

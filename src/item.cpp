@@ -171,14 +171,16 @@ bool operator==(const Item item1, const Item item2) {
 //  std::string s = iObj.str();
 std::string Item::str() const {
     std::stringstream sstr;
+    long unsigned int counter = 1;
     
     sstr << "{" ;
     for (auto itr = entries.begin(); itr != entries.end(); ++itr){
         sstr << "\"" << itr -> first << "\""
              << ":\"" << itr -> second << "\"";
         
-        if(++itr != entries.end()) {
+        if(counter != entries.size()) {
             sstr << ",";
+            counter++;
         }
     }
     sstr << "}";

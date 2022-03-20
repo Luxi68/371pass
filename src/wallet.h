@@ -34,6 +34,7 @@ class Wallet {
 
         void load(const std::string filename);
         std::string str() const;
+        void save(std::string filepath) const;
 };
 
 #endif // WALLET_H
