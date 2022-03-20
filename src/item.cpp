@@ -133,6 +133,7 @@ bool Item::deleteEntry(std::string key) {
 
     if (itr != this -> entries.end()) {
         this -> entries.erase(itr);
+        // std::cout << key << " has been deleted from " << this -> ident << std::endl;
         return true;
     } else {
         throw std::out_of_range("deleteEntry failed, no entry found for key: " + key);

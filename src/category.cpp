@@ -155,6 +155,7 @@ bool Category::deleteItem(std::string itemIdent) {
     for (auto itr = items.begin(); itr != items.end(); ++itr) {
         if(itr -> getIdent() == itemIdent) {
             itr = items.erase(itr);
+            // std::cout << itemIdent << " has been erased from " << this -> ident << std::endl;
             return true;
         }
     }

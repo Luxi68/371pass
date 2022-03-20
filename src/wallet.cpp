@@ -129,6 +129,7 @@ bool Wallet::deleteCategory(std::string categoryIdent) {
     for (auto const& category : categories) {
         if(category.getIdent() == categoryIdent) {
             categories.remove(category);
+            // std::cout << categoryIdent << " has been erased from wallet" << std::endl;
             return true;
         }
     }

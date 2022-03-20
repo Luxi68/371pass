@@ -80,8 +80,6 @@ int App::run(int argc, char *argv[]) {
 			const std::string category = args["category"].as<std::string>();
 
 			Category cObj{category};
-			// std::cout << category << std::endl;
-			// std::cout << cObj.getIdent() << std::endl;
 			try {
 				wObj.addCategory(cObj);
 			} catch (std::runtime_error const&) {
@@ -179,7 +177,75 @@ int App::run(int argc, char *argv[]) {
 		break;
 
 	case Action::DELETE:
-		throw std::runtime_error("delete not implemented");
+		switch (o) {
+		case Objs::NONE:
+			std::cerr << "Error: missing category, item or entry argument(s)." << std::endl;
+			return 1;
+		
+		case Objs::CATEGORY: {
+			const std::string category = args["category"].as<std::string>();
+
+			try {
+				wObj.deleteCategory(category);
+			} catch (std::out_of_range const&) {
+				std::cerr << "Error: invalid category argument(s)." << std::endl;
+				return 1;
+			}
+
+			wObj.save(db);
+			break;
+		}
+		case Objs::ITEM: {
+			const std::string category = args["category"].as<std::string>();
+			const std::string item = args["item"].as<std::string>();
+
+			try {
+				Category cObj = wObj.getCategory(category);
+				try {
+					cObj.deleteItem(item);
+				} catch (std::out_of_range const&) {
+					std::cerr << "Error: invalid item argument(s)." << std::endl;
+					return 1;
+				}
+			} catch(std::out_of_range const&) {
+				std::cerr << "Error: invalid category argument(s)." << std::endl;
+				return 1;
+			}
+
+			wObj.save(db);
+			break;
+		}
+		case Objs::ENTRY: {
+			const std::string category = args["category"].as<std::string>();
+			const std::string item = args["item"].as<std::string>();
+			const std::string entry = args["entry"].as<std::string>();
+			
+			try {
+				const Category cObj = wObj.getCategory(category);
+				try {
+					Item iObj = cObj.getItem(item);
+					try {
+						iObj.deleteEntry(entry);
+					} catch(std::out_of_range const&) {
+						std::cerr << "Error: invalid entry argument(s)." << std::endl;
+						return 1;
+					}
+				} catch (std::out_of_range const&) {
+					std::cerr << "Error: invalid item argument(s)." << std::endl;
+					return 1;
+				}
+			} catch(std::out_of_range const&) {
+				std::cerr << "Error: invalid category argument(s)." << std::endl;
+				return 1;
+			}
+
+			wObj.save(db);
+			break;
+		}
+		default:
+			std::cerr << "Error: unexpected arguments for delete action." << std::endl;
+			return 1;
+		}
 		break;
 
 	default:
@@ -361,7 +427,7 @@ std::string App::getJSON(Wallet &wObj) {
 std::string App::getJSON(Wallet &wObj, const std::string &c) {
 	// Only uncomment this once you have implemented the functions used!
 	try {
-		const auto cObj = wObj.getCategory(c);
+		const Category cObj = wObj.getCategory(c);
 		return cObj.str();
 	} catch(std::out_of_range const&) {
 		std::cerr << "Error: invalid category argument(s)." << std::endl;
@@ -386,9 +452,9 @@ std::string App::getJSON(Wallet &wObj, const std::string &c,
 						 const std::string &i) {
 	// Only uncomment this once you have implemented the functions used!
 	try {
-		const auto cObj = wObj.getCategory(c);
+		const Category cObj = wObj.getCategory(c);
 		try {
-			const auto iObj = cObj.getItem(i);
+			const Item iObj = cObj.getItem(i);
 			return iObj.str();
 		} catch (std::out_of_range const&) {
 			std::cerr << "Error: invalid item argument(s)." << std::endl;
@@ -418,9 +484,9 @@ std::string App::getJSON(Wallet &wObj, const std::string &c,
 						 const std::string &i, const std::string &e) {
 	// Only uncomment this once you have implemented the functions used!
 	try {
-		const auto cObj = wObj.getCategory(c);
+		const Category cObj = wObj.getCategory(c);
 		try {
-			const auto iObj = cObj.getItem(i);
+			const Item iObj = cObj.getItem(i);
 			try {
 				return iObj.getEntry(e);
 			} catch(std::out_of_range const&) {
