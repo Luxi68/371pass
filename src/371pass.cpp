@@ -53,6 +53,20 @@ int App::run(int argc, char *argv[]) {
 	// Only uncomment this once you have implemented the load function!
 	wObj.load(db);
 	
+	// Trying to parse action to catch any exeptions
+	try {
+		parseActionArgument(args);
+	} catch (std::invalid_argument const&) {
+		std::cerr << "Error: invalid action argument(s)." << std::endl;
+		return 1;
+	} catch (cxxopts::option_has_no_value_exception const&) {
+		std::cerr << "Error: missing action argument(s)." << std::endl;
+		return 1;
+	} catch (cxxopts::missing_argument_exception const&) {
+		std::cerr << "Error: missing action argument(s)." << std::endl;
+		return 1;
+	}
+
 	const Action a = parseActionArgument(args);
 	const Objs o = parseObjsArgument(args);
 	switch (a) {
@@ -227,32 +241,22 @@ cxxopts::Options App::cxxoptsSetup() {
 //  auto args = options.parse(argc, argv);
 //  App::Action action = parseActionArgument(args);
 App::Action App::parseActionArgument(cxxopts::ParseResult &args) {
-	try {
-		std::string input = args["action"].as<std::string>();
+	std::string input = args["action"].as<std::string>();
 
-		std::for_each(input.begin(), input.end(), [](char &c)
-					{ c = ::tolower(c); });
+	std::for_each(input.begin(), input.end(), [](char &c)
+				{ c = ::tolower(c); });
 
-		if (input == "create") {
-			return Action::CREATE;
-		} else if (input == "read") {
-			return Action::READ;
-		} else if (input == "update") {
-			return Action::UPDATE;
-		} else if (input == "delete") {
-			return Action::DELETE;
-		} else {
-			std::cerr << "Error: invalid action argument(s)." << std::endl;
-			throw std::invalid_argument("action");
-		}
-
-	} catch (cxxopts::option_has_no_value_exception const&) {
-		std::cerr << "Error: missing action argument(s)." << std::endl;
+	if (input == "create") {
+		return Action::CREATE;
+	} else if (input == "read") {
+		return Action::READ;
+	} else if (input == "update") {
+		return Action::UPDATE;
+	} else if (input == "delete") {
+		return Action::DELETE;
+	} else {
 		throw std::invalid_argument("action");
-	} catch (cxxopts::missing_argument_exception const&) {
-		std::cerr << "Error: missing action argument(s)." << std::endl;
-		exit(1);
-	}
+	}	
 }
 
 // A function which checks the arguments relating to category, item and entry
