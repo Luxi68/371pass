@@ -9,7 +9,9 @@
 
 #include <algorithm>
 #include <iostream>
+#include <sstream>
 #include <string>
+#include <vector>
 #include <unordered_map>
 
 #include "371pass.h"
@@ -55,7 +57,70 @@ int App::run(int argc, char *argv[]) {
 	const Objs o = parseObjsArgument(args);
 	switch (a) {
 	case Action::CREATE:
-		throw std::runtime_error("create not implemented");
+		switch (o) {
+		case Objs::NONE: //trying to creating with no arguments
+			std::cerr << "Error: missing category, item or entry argument(s)." << std::endl;
+			return 1;
+
+		case Objs::CATEGORY: {
+			const std::string category = args["category"].as<std::string>();
+
+			Category cObj{category};
+			std::cout << category << std::endl;
+			std::cout << cObj.getIdent() << std::endl;
+			try {
+				wObj.addCategory(cObj);
+			} catch (std::runtime_error const&) {
+				std::cerr << "Error: failed to insert category " << category << " into wallet." << std::endl;
+				return 1;
+			}
+			break;
+		}
+		case Objs::ITEM: {
+			const std::string category = args["category"].as<std::string>();
+			const std::string item = args["item"].as<std::string>();
+
+			Category cObj{category};
+			Item iObj{item};
+
+			cObj.addItem(iObj);
+			try {
+				wObj.addCategory(cObj);
+			} catch (std::runtime_error const&) {
+				std::cerr << "Error: failed to insert category " << category << " into wallet." << std::endl;
+				return 1;
+			}
+			break;
+		}
+		case Objs::ENTRY: {
+			const std::string category = args["category"].as<std::string>();
+			const std::string item = args["item"].as<std::string>();
+			const auto entry = splitStr((args["entry"].as<std::string>()), ',');
+
+			Category cObj{category};
+			Item iObj{item};
+			
+			if(entry.size() == 2) { //expected output
+				iObj.addEntry(entry[0], entry[1]);
+			} else if (entry.size() == 1) { //if entry is missing value
+				iObj.addEntry(entry[0], "");
+			} else { //TODO add option of creating more than one entry pairs
+				std::cerr << "Error: invalid entry argument(s)." << std::endl;
+				return 1;
+			}
+			cObj.addItem(iObj);
+			try {
+				wObj.addCategory(cObj);
+			} catch (std::runtime_error const&) {
+				std::cerr << "Error: failed to insert category " << category << " into wallet." << std::endl;
+				return 1;
+			}
+			break;
+		}
+		default:
+			std::cerr << "Error: unexpected arguments for create action." << std::endl;
+			return 1;
+		}
 		break;
 
 	case Action::READ:
@@ -83,7 +148,7 @@ int App::run(int argc, char *argv[]) {
 			break;
 		}
 		default:
-			std::cerr << "Error: Unexpected arguments for read action." << std::endl;
+			std::cerr << "Error: unexpected arguments for read action." << std::endl;
 			return 1;
 		}
 		break;
@@ -285,7 +350,7 @@ std::string App::getJSON(Wallet &wObj) {
 std::string App::getJSON(Wallet &wObj, const std::string &c) {
 	// Only uncomment this once you have implemented the functions used!
 	try {
-		auto cObj = wObj.getCategory(c);
+		const auto cObj = wObj.getCategory(c);
 		return cObj.str();
 	} catch(std::out_of_range const&) {
 		std::cerr << "Error: invalid category argument(s)." << std::endl;
@@ -310,9 +375,9 @@ std::string App::getJSON(Wallet &wObj, const std::string &c,
 						 const std::string &i) {
 	// Only uncomment this once you have implemented the functions used!
 	try {
-		auto cObj = wObj.getCategory(c);
+		const auto cObj = wObj.getCategory(c);
 		try {
-			auto iObj = cObj.getItem(i);
+			const auto iObj = cObj.getItem(i);
 			return iObj.str();
 		} catch (std::out_of_range const&) {
 			std::cerr << "Error: invalid item argument(s)." << std::endl;
@@ -342,9 +407,9 @@ std::string App::getJSON(Wallet &wObj, const std::string &c,
 						 const std::string &i, const std::string &e) {
 	// Only uncomment this once you have implemented the functions used!
 	try {
-		auto cObj = wObj.getCategory(c);
+		const auto cObj = wObj.getCategory(c);
 		try {
-			auto iObj = cObj.getItem(i);
+			const auto iObj = cObj.getItem(i);
 			try {
 				return iObj.getEntry(e);
 			} catch(std::out_of_range const&) {
@@ -359,4 +424,19 @@ std::string App::getJSON(Wallet &wObj, const std::string &c,
 		std::cerr << "Error: invalid category argument(s)." << std::endl;
 		exit(1);
 	}
+}
+
+// This function takes in a string and the requested delimiter and returns
+// the result in a vector
+std::vector<std::string> App::splitStr(std::string str, const char delim) {
+	std::stringstream sstr(str);
+	std::vector<std::string> output;
+
+	while (sstr.good()){
+		std::string substr;
+		getline(sstr, substr, delim);
+
+		output.push_back(substr);
+	}
+	return output;
 }

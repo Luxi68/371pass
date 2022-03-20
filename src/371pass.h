@@ -56,6 +56,7 @@ std::string getJSON(Wallet &w, const std::string &c, const std::string &i);
 std::string getJSON(Wallet &wObj, const std::string &c, const std::string &i,
                     const std::string &e);
 
+std::vector<std::string> splitStr(std::string str, const char delim);
 } // namespace App
 
 #endif // _371PASS_H
