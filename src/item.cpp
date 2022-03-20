@@ -22,9 +22,12 @@
 Item::Item(const std::string ident) {
     this -> ident = ident;
     std::map<std::string, std::string> entries;
+    // std::cout << "Constructed Item... " << ident << std::endl;
 }
 
-Item::~Item() {}
+Item::~Item() {
+    // std::cout << "Destructed Item... " << ident << std::endl;
+}
 
 // TODO Write a function, size, that takes no parameters and returns an unsigned
 //  int of the number of entries in the Item contains.

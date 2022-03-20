@@ -24,9 +24,12 @@
 Category::Category(const std::string ident) {
     this -> ident = ident;
     std::list<Item> items;
+    // std::cout << "Constructed Category... " << ident << std::endl;
 }
 
-Category::~Category() {}
+Category::~Category() {
+    // std::cout << "Destructed Category... " << ident << std::endl;
+}
 
 // TODO Write a function, size, that takes no parameters and returns an unsigned
 //  int of the number of Items in the Category contains.

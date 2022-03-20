@@ -23,9 +23,12 @@
 //  Wallet wObj{};
 Wallet::Wallet() {
     std::list<Category> categories;
+    // std::cout << "Constructed Wallet..." << std::endl;
 }
 
-Wallet::~Wallet() {}
+Wallet::~Wallet() {
+    // std::cout << "Destructed Wallet..." << std::endl;
+}
 
 // TODO Write a function, size, that takes no parameters and returns an unsigned
 //  int of the number of categories in the Wallet contains.
