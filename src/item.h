@@ -31,12 +31,13 @@ class Item {
         bool empty();
         
         std::string getIdent() const;
+        std::map<std::string, std::string> getAllEntries() const;
         
         bool addEntry(std::string key, std::string value);
         std::string getEntry(std::string key) const;
         bool deleteEntry(std::string key);
 
-        Item mergeItem(Item newItem) const;
+        void mergeItem(const Item item);
         friend bool operator==(const Item item1, const Item item2);
         std::string str() const;
 };

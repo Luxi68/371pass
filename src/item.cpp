@@ -10,7 +10,7 @@
 #include <string>
 #include <map>
 #include <sstream>
-// #include <iostream>
+#include <iostream>
 
 #include "item.h"
 
@@ -75,6 +75,11 @@ std::string Item::getIdent() const {
 //  Item iObj{"identIdent"};
 //  iObj.setIdent("identIdent2");
 
+// Returns the map for the entries
+std::map<std::string, std::string> Item::getAllEntries() const {
+    return this -> entries;
+}
+
 // TODO Write a function, addEntry, that takes two parameters, an entry
 //  key and value and returns true if the entry was inserted into the
 //  container or false if the entry already existed and was replaced.
@@ -87,12 +92,13 @@ bool Item::addEntry(std::string key, std::string value) {
     auto itr = this -> entries.find(key);
 
     if (itr != this -> entries.end()) {
+        // std::cout << key << " old entry has been errased" << std::endl;
         entries.erase(key);
         isFound = true;
     }
 
     this -> entries.insert (std::pair<std::string, std::string>(key, value));
-    // std::cout << key << " has been added to " << this -> getIdent() << std::endl;
+    // std::cout << key << " new entry has been added to " << this -> getIdent() << std::endl;
     return !isFound;
 }
 
@@ -133,8 +139,8 @@ bool Item::deleteEntry(std::string key) {
     }
 }
 
-// A function which takes a item with the same ident value and
-//  merges it with this (new) item. For any entries with the same key,
+// A function which takes a new item with the same ident value and
+//  merges it with this (old) item. For any entries with the same key,
 //  the new item takes priority. Returns the merged item object
 //
 // Example:
@@ -142,12 +148,12 @@ bool Item::deleteEntry(std::string key) {
 //  iObj1.addEntry("key", "value");
 //  Item iObj2{"identIdent"};
 //  Item iObj3 = iObj2.merge(iObj1);
-Item Item::mergeItem(Item oldItem) const {
-    auto itr = this -> entries.begin();
-    while (itr != this -> entries.end()) {
-        oldItem.addEntry(itr -> first, itr -> second);
+void Item::mergeItem(const Item newItem) {
+    std::map<std::string, std::string> newItemEntries = newItem.getAllEntries();
+
+    for (auto itr = newItemEntries.begin(); itr != newItemEntries.end(); ++itr) {
+        this -> addEntry(itr -> first, itr -> second);
     }
-    return oldItem;
 }
 
 // TODO Write an == operator overload for the Item class, such that two

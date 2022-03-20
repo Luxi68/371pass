@@ -52,7 +52,7 @@ int App::run(int argc, char *argv[]) {
 	Wallet wObj{};
 	// Only uncomment this once you have implemented the load function!
 	wObj.load(db);
-
+	
 	const Action a = parseActionArgument(args);
 	const Objs o = parseObjsArgument(args);
 	switch (a) {
@@ -66,14 +66,16 @@ int App::run(int argc, char *argv[]) {
 			const std::string category = args["category"].as<std::string>();
 
 			Category cObj{category};
-			std::cout << category << std::endl;
-			std::cout << cObj.getIdent() << std::endl;
+			// std::cout << category << std::endl;
+			// std::cout << cObj.getIdent() << std::endl;
 			try {
 				wObj.addCategory(cObj);
 			} catch (std::runtime_error const&) {
 				std::cerr << "Error: failed to insert category " << category << " into wallet." << std::endl;
 				return 1;
 			}
+
+			wObj.save(db);
 			break;
 		}
 		case Objs::ITEM: {
@@ -90,6 +92,8 @@ int App::run(int argc, char *argv[]) {
 				std::cerr << "Error: failed to insert category " << category << " into wallet." << std::endl;
 				return 1;
 			}
+
+			wObj.save(db);
 			break;
 		}
 		case Objs::ENTRY: {
@@ -99,22 +103,25 @@ int App::run(int argc, char *argv[]) {
 
 			Category cObj{category};
 			Item iObj{item};
-			
+
 			if(entry.size() == 2) { //expected output
-				iObj.addEntry(entry[0], entry[1]);
+				iObj.addEntry(entry.at(0), entry.at(1));
 			} else if (entry.size() == 1) { //if entry is missing value
-				iObj.addEntry(entry[0], "");
+				iObj.addEntry(entry.at(0), "");
 			} else { //TODO add option of creating more than one entry pairs
 				std::cerr << "Error: invalid entry argument(s)." << std::endl;
 				return 1;
 			}
 			cObj.addItem(iObj);
+
 			try {
 				wObj.addCategory(cObj);
 			} catch (std::runtime_error const&) {
 				std::cerr << "Error: failed to insert category " << category << " into wallet." << std::endl;
 				return 1;
-			}
+			}			
+
+			wObj.save(db);
 			break;
 		}
 		default:

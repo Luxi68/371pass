@@ -7,7 +7,7 @@
 // Canvas: https://canvas.swansea.ac.uk/courses/24793
 // -----------------------------------------------------
 
-// #include <iostream>
+#include <iostream>
 #include <fstream>
 #include <sstream>
 
@@ -74,31 +74,26 @@ bool Wallet::empty() {
 //  Category cObj{"categoryIdent"};
 //  wObj.addCategory(cObj);
 bool Wallet::addCategory(Category newCategory) {
-    bool isFound = false;
-
-    for (auto const& category : categories) {
-        if(category.getIdent() == newCategory.getIdent()) {
-            isFound = true;
-
-            if (category == newCategory) {
-                return !isFound;
+    for(auto itr = categories.begin(); itr != categories.end(); ++itr) {
+        if(itr -> getIdent() == newCategory.getIdent()) {
+            if (*itr == newCategory) {
+                return false;
             }
 
-            newCategory = newCategory.mergeCategory(category);
-
-            // BUG Category may sometimes fail to push but still cause another to be removed
-            categories.remove(category);
+            itr -> mergeCategory(newCategory);
+            // std::cout << newCategory.getIdent() << " new category merged with old" << std::endl;
+            return false;
         }
     }
 
     try {
         categories.push_back(newCategory);
-        // std::cout << newCategory.getIdent() << " has been added to wallet" << std::endl;
+        // std::cout << newCategory.getIdent() << " new category has been added to wallet" << std::endl;
+        return true;
+
     } catch (std::length_error const&) { 
         throw std::runtime_error("Could not add category: " + newCategory.getIdent());
     }
-    
-    return !isFound;
 }
 
 // TODO Write a function, getCategory, that takes one parameter, a Category
@@ -207,7 +202,8 @@ void Wallet::load(const std::string filename){
     nlohmann::json jsonFile = nlohmann::json::parse(ifs);
 
     for(auto i = jsonFile.begin(); i != jsonFile.end(); ++i) {
-        Category cObj{i.key()};
+        std::size_t itemSize = i.value().size();
+        Category cObj{i.key(), itemSize};
 
         for(auto j = i.value().begin(); j != i.value().end(); ++j) {
             Item iObj{j.key()};

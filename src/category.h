@@ -13,28 +13,30 @@
 #ifndef CATEGORY_H
 #define CATEGORY_H
 
-#include <list>
+#include <vector>
 #include "item.h"
 
 class Category {
     private:
         std::string ident;
-        std::list<Item> items;
+        std::vector<Item> items;
 
     public:
         Category(const std::string ident);
+        Category(const std::string ident, const std::size_t size);
         ~Category();
 
         unsigned int size();
         bool empty();
 
         std::string getIdent() const;
+        std::vector<Item> getAllItems() const;
 
         bool addItem(Item item);
         Item getItem(std::string itemIdent) const;
         bool deleteItem(std::string itemIdent);
 
-        Category mergeCategory(Category oldCategory) const;
+        void mergeCategory(const Category Category);
         friend bool operator==(const Category category1, const Category category2);
         std::string str() const;
 };

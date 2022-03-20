@@ -7,11 +7,12 @@
 // Canvas: https://canvas.swansea.ac.uk/courses/24793
 // -----------------------------------------------------
 
+#include <algorithm>
 #include <string>
-#include <list>
+#include <vector>
 #include <stdexcept>
 #include <sstream>
-// #include <iostream>
+#include <iostream>
 
 #include "item.h"
 #include "category.h"
@@ -23,8 +24,15 @@
 //  Category c{"categoryIdent"};
 Category::Category(const std::string ident) {
     this -> ident = ident;
-    std::list<Item> items;
+    std::vector<Item> items;
     // std::cout << "Constructed Category... " << ident << std::endl;
+}
+
+Category::Category(const std::string ident, const std::size_t size) {
+    this -> ident = ident;
+    std::vector<Item> items;
+    items.reserve(size);
+    // std::cout << "Constructed Category with size... " << ident << std::endl;
 }
 
 Category::~Category() {
@@ -81,6 +89,11 @@ std::string Category::getIdent() const {
 //  Category cObj{"categoryIdent"};
 //  cObj.newItem("itemIdent");
 
+// Return the vector of items.
+std::vector<Item> Category::getAllItems() const {
+    return this -> items;
+}
+
 // TODO Write a function, addItem, that takes one parameter, an Item object,
 //  and returns true if the object was successfully inserted. If an object with
 //  the same identifier already exists, then the contents should be merged and
@@ -91,24 +104,21 @@ std::string Category::getIdent() const {
 //  Item iObj{"itemIdent"};
 //  cObj.addItem(iObj);
 bool Category::addItem(Item newItem) {
-    bool isFound = false;
-
-    for (auto const& item : items) {
-        if(item.getIdent() == newItem.getIdent()) {
-            isFound = true;
-
-            if (item == newItem) {
-                return !isFound;
+    for (auto itr = items.begin(); itr != items.end(); ++itr) {
+        if(itr -> getIdent() == newItem.getIdent()) {
+            if (*itr == newItem) {
+                return false;
             }
 
-            newItem = newItem.mergeItem(item);
-            // std::cout << newItem.getIdent() << " has been added to " << this -> getIdent() << std::endl;
-            items.remove(item);
+            itr -> mergeItem(newItem);
+            // std::cout << newItem.getIdent() << " new item merged with old" << std::endl;
+            return false;
         }
     }
 
     items.push_back(newItem);
-    return !isFound;
+    // std::cout << newItem.getIdent() << " new item has been added to " << this -> getIdent() << std::endl;
+    return true;
 }
 
 // TODO Write a function, getItem, that takes one parameter, an Item
@@ -142,9 +152,9 @@ Item Category::getItem(std::string itemIdent) const {
 //  cObj.newItem("itemIdent");
 //  bool result = cObj.deleteItem("itemIdent");
 bool Category::deleteItem(std::string itemIdent) {
-    for (auto const& item : items) {
-        if(item.getIdent() == itemIdent) {
-            items.remove(item);
+    for (auto itr = items.begin(); itr != items.end(); ++itr) {
+        if(itr -> getIdent() == itemIdent) {
+            itr = items.erase(itr);
             return true;
         }
     }
@@ -152,8 +162,10 @@ bool Category::deleteItem(std::string itemIdent) {
     throw std::out_of_range("deleteItem failed, no item found for itemIdent: " + itemIdent);
 }
 
-// A function which takes a category with the same ident value and
-//  merges it with this (new) category. For any entries with the same key,
+
+
+// A function which takes a new category with the same ident value and
+//  merges it with this (old) category. For any entries with the same key,
 //  the new category takes priority. Returns the merged category object
 //
 // Example:
@@ -161,11 +173,11 @@ bool Category::deleteItem(std::string itemIdent) {
 //  iObj1.addEntry("key", "value");
 //  Item iObj2{"identIdent"};
 //  Item iObj3 = iObj2.merge(iObj1);
-Category Category::mergeCategory(Category oldCategory) const {
-    for (auto const& item : items) {
-        oldCategory.addItem(item);
+void Category::mergeCategory(const Category newCategory) {
+    std::vector<Item> newCategoryItems = newCategory.getAllItems();
+    for (auto const& item : newCategoryItems) {
+        this -> addItem(item);
     }
-    return oldCategory;
 }
 
 // TODO Write an == operator overload for the Category class, such that two
