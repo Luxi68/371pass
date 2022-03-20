@@ -177,7 +177,7 @@ Category Category::mergeCategory(Category oldCategory) const {
 //    ...
 //  }
 bool operator==(const Category category1, const Category category2) {
-    return (category1.getIdent() == category2.getIdent()) && (category1.items == category2.items);
+    return (category1.ident == category2.ident) && (category1.items == category2.items);
 }
 
 // TODO Write a function, str, that takes no parameters and returns a

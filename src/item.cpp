@@ -159,7 +159,7 @@ Item Item::mergeItem(Item oldItem) const {
 //    ...
 //  }
 bool operator==(const Item item1, const Item item2) {
-    return (item1.getIdent() == item2.getIdent()) && (item1.entries == item2.entries);
+    return (item1.ident == item2.ident) && (item1.entries == item2.entries);
 }
 
 // TODO Write a function, str, that takes no parameters and returns a
