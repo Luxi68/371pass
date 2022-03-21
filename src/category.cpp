@@ -100,6 +100,23 @@ std::vector<Item> Category::getAllItems() const {
 // Example:
 //  Category cObj{"categoryIdent"};
 //  cObj.newItem("itemIdent");
+Item &Category::newItem(const std::string itemIdent) {
+    for (auto &item : items) {
+        if(item.getIdent() == itemIdent) {
+            return item;
+        }
+    }
+
+    Item iObj{itemIdent};
+    Item &iObjRef = iObj;
+    try {
+        items.push_back(iObj);
+    } catch (std::length_error const&) { 
+        throw std::runtime_error("Could not create new item: " + itemIdent);
+    }
+    
+    return iObjRef;
+}
 
 // TODO Write a function, addItem, that takes one parameter, an Item object,
 //  and returns true if the object was successfully inserted. If an object with
@@ -137,7 +154,7 @@ bool Category::addItem(const Item newItem) {
 //  Category cObj{"categoryIdent"};
 //  cObj.newItem("itemIdent");
 //  auto iObj = cObj.getItem("itemIdent");
-Item Category::getItem(std::string itemIdent) const {
+Item Category::getItem(const std::string itemIdent) const {
     for (auto const& item : items) {
         if(item.getIdent() == itemIdent) {
             return item;

@@ -33,8 +33,9 @@ class Category {
         void setIdent(const std::string newIdent);
         std::vector<Item> getAllItems() const;
 
+        Item &newItem(const std::string itemIdent);
         bool addItem(const Item item);
-        Item getItem(std::string itemIdent) const;
+        Item getItem(const std::string itemIdent) const;
         bool deleteItem(const std::string itemIdent);
 
         void mergeCategory(const Category Category);
