@@ -48,16 +48,6 @@ bool Item::empty() const {
     return false;
 }
 
-// TODO Write a function, setIdent, that takes one parameter, a string for a new
-//  Item identifier, and updates the member variable. It returns nothing.
-//
-// Example:
-//  Item iObj{"identIdent"};
-//  iObj.setIdent("identIdent2");
-void Item::setIdent(const std::string newIdent) {
-    this -> ident = newIdent;
-}
-
 // TODO Write a function, getIdent, that returns the identifier for the Item.
 //
 // Example:
@@ -73,6 +63,9 @@ std::string Item::getIdent() const {
 // Example:
 //  Item iObj{"identIdent"};
 //  iObj.setIdent("identIdent2");
+void Item::setIdent(const std::string newIdent) {
+    this -> ident = newIdent;
+}
 
 // A function which returns the map for the entries within this item.
 //

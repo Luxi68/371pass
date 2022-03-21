@@ -30,8 +30,8 @@ class Item {
         unsigned int size() const;
         bool empty() const;
         
-        void setIdent(const std::string newIdent);
         std::string getIdent() const;
+        void setIdent(const std::string newIdent);
         std::map<std::string, std::string> getAllEntries() const;
         
         bool addEntry(const std::string key, const std::string value);
