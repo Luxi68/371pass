@@ -12,8 +12,8 @@
 
 #include "lib_json.hpp"
 #include "wallet.h"
-#include "category.h"
-#include "item.h"
+// #include "category.h"
+// #include "item.h"
 
 // TODO Write a Wallet constructor that takes no parameters and constructs an
 //  empty wallet.
@@ -21,7 +21,7 @@
 // Example:
 //  Wallet wObj{};
 Wallet::Wallet() {
-    std::list<Category> categories;
+    std::vector<Category> categories;
 }
 
 Wallet::~Wallet() {}
@@ -58,7 +58,23 @@ bool Wallet::empty() const {
 // Example:
 //  Wallet wObj{};
 //  wObj.newCategory("categoryIdent");
-// Category &Wallet::newCategory(const std::string categoryIdent) {} 
+Category &Wallet::newCategory(const std::string categoryIdent) {
+    for (Category &category : categories) {
+        if(category.getIdent() == categoryIdent) {
+            return category;
+        }
+    }
+
+    Category cObj{categoryIdent};
+    Category &cObjRef = cObj;
+    try {
+        categories.push_back(cObj);
+    } catch (std::length_error const&) { 
+        throw std::runtime_error("Could not create new item: " + categoryIdent);
+    }
+    
+    return cObjRef;
+}
 
 // TODO Write a function, addCategory, that takes one parameter, a Category
 //  object, and returns true if the object was successfully inserted. If an
@@ -120,9 +136,9 @@ Category Wallet::getCategory(std::string categoryIdent) const {
 //  wObj.newCategory("categoryIdent");
 //  wObj.deleteCategory("categoryIdent");
 bool Wallet::deleteCategory(const std::string categoryIdent) {
-    for (auto const& category : categories) {
-        if(category.getIdent() == categoryIdent) {
-            categories.remove(category);
+    for (auto itr = categories.begin(); itr != categories.end(); ++itr) {
+        if(itr -> getIdent() == categoryIdent) {
+            itr = categories.erase(itr);
             return true;
         }
     }

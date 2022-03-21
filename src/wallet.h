@@ -14,12 +14,12 @@
 #ifndef WALLET_H
 #define WALLET_H
 
-#include <list>
+#include <vector>
 #include "category.h"
 
 class Wallet {
     private:
-        std::list<Category> categories;
+        std::vector<Category> categories;
 
     public:
         Wallet();
@@ -28,7 +28,7 @@ class Wallet {
         unsigned int size() const;
         bool empty() const;
 
-        // Category &newCategory(const std::string categoryIdent);
+        Category &newCategory(const std::string categoryIdent);
         bool addCategory(const Category category);
         Category getCategory(std::string categoryIdent) const;
         bool deleteCategory(const std::string categoryIdent);
