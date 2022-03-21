@@ -28,6 +28,11 @@ Category::Category(const std::string ident) {
     // std::cout << "Constructed Category... " << ident << std::endl;
 }
 
+// A constructor which initialialises the object and member data,
+//  including preallocating a set size of memory for the items. 
+//
+// Example:
+//  Category c{"categoryIdent", itemsSize};
 Category::Category(const std::string ident, const std::size_t size) {
     this -> ident = ident;
     std::vector<Item> items;
@@ -82,7 +87,11 @@ void Category::setIdent(const std::string newIdent) {
     this -> ident = newIdent;
 }
 
-// Return the vector of items.
+// A function which returns the vector for the items within this category.
+//
+// Example:
+//  Category cObj{"categoryIdent"};
+//  auto items = iObj.getAllItems();
 std::vector<Item> Category::getAllItems() const {
     return this -> items;
 }
@@ -165,8 +174,6 @@ bool Category::deleteItem(const std::string itemIdent) {
 
     throw std::out_of_range("deleteItem failed, no item found for itemIdent: " + itemIdent);
 }
-
-
 
 // A function which takes a new category with the same ident value and
 //  merges it with this (old) category. For any entries with the same key,

@@ -78,7 +78,11 @@ std::string Item::getIdent() const {
 //  Item iObj{"identIdent"};
 //  iObj.setIdent("identIdent2");
 
-// Returns the map for the entries
+// A function which returns the map for the entries within this item.
+//
+// Example:
+//  Item iObj{"identIdent"};
+//  auto entries = iObj.getAllEntries();
 std::map<std::string, std::string> Item::getAllEntries() const {
     return this -> entries;
 }

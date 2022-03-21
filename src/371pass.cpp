@@ -68,15 +68,11 @@ int App::run(int argc, char *argv[]) {
 	}
 
 	const Action a = parseActionArgument(args);
-	const Objs o = parseObjsArgument(args);
+	const Modify n = parseModifyArgument(args);
 	switch (a) {
 	case Action::CREATE:
-		switch (o) {
-		case Objs::NONE: //trying to creating with no arguments
-			std::cerr << "Error: missing category, item or entry argument(s)." << std::endl;
-			return 1;
-
-		case Objs::CATEGORY: {
+		switch (n) {
+		case Modify::CATEGORY: { //trying to create category
 			const std::string category = args["category"].as<std::string>();
 
 			Category cObj{category};
@@ -90,7 +86,7 @@ int App::run(int argc, char *argv[]) {
 			wObj.save(db);
 			break;
 		}
-		case Objs::ITEM: {
+		case Modify::ITEM: { //trying to create item
 			const std::string category = args["category"].as<std::string>();
 			const std::string item = args["item"].as<std::string>();
 
@@ -108,7 +104,7 @@ int App::run(int argc, char *argv[]) {
 			wObj.save(db);
 			break;
 		}
-		case Objs::ENTRY: {
+		case Modify::ENTRY: { //trying to create entry
 			const std::string category = args["category"].as<std::string>();
 			const std::string item = args["item"].as<std::string>();
 			const auto entry = splitStr((args["entry"].as<std::string>()), ',');
@@ -116,11 +112,12 @@ int App::run(int argc, char *argv[]) {
 			Category cObj{category};
 			Item iObj{item};
 
-			if(entry.size() == 2 && entry[1] != "") { //expected output
+			// Check for valid entry inputs
+			if(entry.size() == 2) { //expected output
 				iObj.addEntry(entry.at(0), entry.at(1));
 			} else if (entry.size() == 1) { //if entry is missing value
 				iObj.addEntry(entry.at(0), "");
-			} else { //TODO add option of creating more than one entry pairs
+			} else {
 				std::cerr << "Error: invalid entry argument(s)." << std::endl;
 				return 1;
 			}
@@ -136,6 +133,10 @@ int App::run(int argc, char *argv[]) {
 			wObj.save(db);
 			break;
 		}
+		case Modify::NONE: //trying to creating with no arguments
+			std::cerr << "Error: missing category, item or entry argument(s)." << std::endl;
+			return 1;
+		
 		default:
 			std::cerr << "Error: unexpected arguments for create action." << std::endl;
 			return 1;
@@ -143,29 +144,29 @@ int App::run(int argc, char *argv[]) {
 		break;
 
 	case Action::READ:
-		switch (o) {
-		case Objs::NONE:
-			std::cout << nlohmann::json::parse(getJSON(wObj)) << std::endl;
-			break;
-			
-		case Objs::CATEGORY: {
+		switch (n) {
+		case Modify::CATEGORY: { //trying to read categories
 			const std::string category = args["category"].as<std::string>();
 			std::cout << nlohmann::json::parse(getJSON(wObj, category)) << std::endl;
 			break;
 		}
-		case Objs::ITEM: {
+		case Modify::ITEM: { //trying to read items
 			const std::string category = args["category"].as<std::string>();
 			const std::string item = args["item"].as<std::string>();
 			std::cout << nlohmann::json::parse(getJSON(wObj, category, item)) << std::endl;
 			break;
 		}
-		case Objs::ENTRY: {
+		case Modify::ENTRY: { //trying to read entries
 			const std::string category = args["category"].as<std::string>();
 			const std::string item = args["item"].as<std::string>();
 			const std::string entry = args["entry"].as<std::string>();
 			std::cout << getJSON(wObj, category, item, entry) << std::endl;
 			break;
 		}
+		case Modify::NONE: //trying to read with no arguments
+			std::cout << nlohmann::json::parse(getJSON(wObj)) << std::endl;
+			break;
+		
 		default:
 			std::cerr << "Error: unexpected arguments for read action." << std::endl;
 			return 1;
@@ -173,19 +174,17 @@ int App::run(int argc, char *argv[]) {
 		break;
 
 	case Action::UPDATE:
-		switch (o) {
-		case Objs::NONE:
-			std::cerr << "Error: missing category, item or entry argument(s)." << std::endl;
-			return 1;
-		
-		case Objs::CATEGORY: {
+		switch (n) {
+		case Modify::CATEGORY: { //trying to update category
 			const auto category = splitStr((args["category"].as<std::string>()), ':');
 
-			if(category.size() == 2 && category[1] != "") { //expected output
+			// Check for valid category inputs
+			if(category.size() == 2 && category[0] != "" && category[1] != "") {
 				try {
+					// Create temporary objects to edit
 					Category tempCategory = wObj.getCategory(category[0]);
 					tempCategory.setIdent(category[1]);
-				
+					// Replace old objects with edited objects
 					wObj.deleteCategory(category[0]);
 					wObj.addCategory(tempCategory);
 				} catch (std::out_of_range const&) {
@@ -200,16 +199,18 @@ int App::run(int argc, char *argv[]) {
 			wObj.save(db);
 			break;
 		}
-		case Objs::ITEM: {
+		case Modify::ITEM: { //trying to update item
 			const std::string category = args["category"].as<std::string>();
 			const auto item = splitStr((args["item"].as<std::string>()), ':');
 
-			if(item.size() == 2 && item[1] != "") { //expected output
+			// Check for valid item inputs
+			if(item.size() == 2 && item[0] != "" && item[1] != "") {
 				try {
+					// Create temporary objects to edit
 					Category tempCategory = wObj.getCategory(category);
 					Item tempItem = tempCategory.getItem(item[0]);
 					tempItem.setIdent(item[1]);
-
+					// Replace old objects with edited objects
 					tempCategory.deleteItem(item[0]);
 					tempCategory.addItem(tempItem);
 					wObj.deleteCategory(category);
@@ -226,16 +227,18 @@ int App::run(int argc, char *argv[]) {
 			wObj.save(db);
 			break;
 		}
-		case Objs::ENTRY: {
+		case Modify::ENTRY: { //trying to update entry
 			const std::string category = args["category"].as<std::string>();
 			const std::string item = args["item"].as<std::string>();
 			const std::string tempEntry = args["entry"].as<std::string>();
-
+			
+			// Test for all combination of : and ,
 			if (tempEntry.find(':') != std::string::npos) { //Found ':'
 				if (tempEntry.find(',') == std::string::npos) { //notFound ','
 					const auto entry = splitStr((args["entry"].as<std::string>()), ':');
 					
-					if(entry.size() == 2 && entry[1] != "") {
+					// Check for valid entry inputs
+					if(entry.size() == 2 && entry[0] != "" && entry[1] != "") {
 						try {
 							// Create temporary objects to edit
 							Category tempCategory = wObj.getCategory(category);
@@ -262,6 +265,7 @@ int App::run(int argc, char *argv[]) {
 					const auto entryOldKey = splitStr((args["entry"].as<std::string>()), ':');
 					const auto entryKeyValue = splitStr((entryOldKey[1]), ',');
 					
+					// Check for valid entry inputs
 					if(entryOldKey.size() == 2 && entryKeyValue.size() == 2 ) {
 						try {
 							// Create temporary objects to edit
@@ -288,7 +292,8 @@ int App::run(int argc, char *argv[]) {
 				if (tempEntry.find(',') != std::string::npos) { //found ','
 					const auto entry = splitStr((args["entry"].as<std::string>()), ',');
 					
-					if(entry.size() == 2 && entry[1] != "") {
+					// Check for valid entry inputs
+					if(entry.size() == 2 && entry[0] != "" && entry[1] != "") {
 						try {
 							// Create temporary objects to edit
 							Category tempCategory = wObj.getCategory(category);
@@ -316,6 +321,10 @@ int App::run(int argc, char *argv[]) {
 			wObj.save(db);
 			break;
 		}
+		case Modify::NONE: //trying to update with no arguments
+			std::cerr << "Error: missing category, item or entry argument(s)." << std::endl;
+			return 1;
+		
 		default:
 			std::cerr << "Error: unexpected arguments for update action." << std::endl;
 			return 1;
@@ -323,12 +332,8 @@ int App::run(int argc, char *argv[]) {
 		break;
 
 	case Action::DELETE:
-		switch (o) {
-		case Objs::NONE:
-			std::cerr << "Error: missing category, item or entry argument(s)." << std::endl;
-			return 1;
-		
-		case Objs::CATEGORY: {
+		switch (n) {
+		case Modify::CATEGORY: { //trying to delete category
 			const std::string category = args["category"].as<std::string>();
 
 			try {
@@ -341,7 +346,7 @@ int App::run(int argc, char *argv[]) {
 			wObj.save(db);
 			break;
 		}
-		case Objs::ITEM: {
+		case Modify::ITEM: { //trying to delete item
 			const std::string category = args["category"].as<std::string>();
 			const std::string item = args["item"].as<std::string>();
 
@@ -360,7 +365,7 @@ int App::run(int argc, char *argv[]) {
 			wObj.save(db);
 			break;
 		}
-		case Objs::ENTRY: {
+		case Modify::ENTRY: { //trying to delete entry
 			const std::string category = args["category"].as<std::string>();
 			const std::string item = args["item"].as<std::string>();
 			const std::string entry = args["entry"].as<std::string>();
@@ -383,6 +388,10 @@ int App::run(int argc, char *argv[]) {
 			wObj.save(db);
 			break;
 		}
+		case Modify::NONE: //trying to delete with no arguments
+			std::cerr << "Error: missing category, item or entry argument(s)." << std::endl;
+			return 1;
+		
 		default:
 			std::cerr << "Error: unexpected arguments for delete action." << std::endl;
 			return 1;
@@ -467,9 +476,16 @@ App::Action App::parseActionArgument(cxxopts::ParseResult &args) {
 }
 
 // A function which checks the arguments relating to category, item and entry
-// values and converts this into a value from the OBJS enum to determine what
-// specific actions are to be taken.
-App::Objs App::parseObjsArgument(cxxopts::ParseResult &args){
+//  values and converts this into a value from the OBJS enum to determine what
+//  specific actions are to be taken.
+//
+// Example:
+//  auto options = App::cxxoptsSetup();
+//  auto args = options.parse(argc, argv);
+//  App::Objs objects = parseObjsArgument(args);
+App::Modify App::parseModifyArgument(cxxopts::ParseResult &args){
+	// Checks to see which modifier have been used and if their
+	// arguments are missing
 	bool hasCategoryInput = true;
 	try {args["category"].as<std::string>();
 	} catch (cxxopts::option_has_no_value_exception const&) {
@@ -497,41 +513,32 @@ App::Objs App::parseObjsArgument(cxxopts::ParseResult &args){
 		exit(1);
 	}
 
+	// Tests all the possible combinations of modifiers
 	if(hasCategoryInput) {
 		if(hasItemInput) {
-			if(hasEntryInput) {
-				// 111
-				return Objs::ENTRY;
-			} else {
-				// 110
-				return Objs::ITEM;
+			if(hasEntryInput) { // 111
+				return Modify::ENTRY;
+			} else { // 110
+				return Modify::ITEM;
 			}
 		} else {
-			if (hasEntryInput) {
-				// 101
-				// return Objs::MISSITE;
+			if (hasEntryInput) { // 101
 				std::cerr << "Error: missing item argument(s)." << std::endl;
 				exit(1);
-			} else {
-				// 100
-				return Objs::CATEGORY;
+			} else { // 100
+				return Modify::CATEGORY;
 			}
 		}
 	} else {
-		if(hasItemInput) {
-			// 011, 010
-			// return Objs::MISSCAT;
+		if(hasItemInput) { // 011, 010
 			std::cerr << "Error: missing category argument(s)." << std::endl;
 			exit(1);
 		} else {
-			if(hasEntryInput) {
-				// 001
-				// return Objs::MISSCAT;
+			if(hasEntryInput) { // 001
 				std::cerr << "Error: missing category argument(s)." << std::endl;
 				exit(1);
-			} else {
-				//000
-				return Objs::NONE;
+			} else { //000
+				return Modify::NONE;
 			}
 		}
 	}
