@@ -104,7 +104,7 @@ bool Item::addEntry(const std::string key, const std::string value) {
 //  Item iObj{"identIdent"};
 //  iObj.addEntry("key", "value");
 //  auto value = iObj.getEntry("key");
-std::string Item::getEntry(std::string key) const {
+std::string Item::getEntry(const std::string key) const {
     auto itr = this -> entries.find(key);
 
     if (itr != this -> entries.end()) {

@@ -35,7 +35,7 @@ class Item {
         std::map<std::string, std::string> getAllEntries() const;
         
         bool addEntry(const std::string key, const std::string value);
-        std::string getEntry(std::string key) const;
+        std::string getEntry(const std::string key) const;
         bool deleteEntry(const std::string key);
 
         void mergeItem(const Item item);
