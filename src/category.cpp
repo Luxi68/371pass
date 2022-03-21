@@ -45,7 +45,7 @@ Category::~Category() {
 // Example:
 //  Category c{"categoryIdent"};
 //  auto size = c.size();
-unsigned int Category::size() {
+unsigned int Category::size() const {
     return this -> items.size();
 }
 
@@ -55,7 +55,7 @@ unsigned int Category::size() {
 // Example:
 //  Category c{"categoryIdent"};
 //  auto empty = c.empty();
-bool Category::empty() {
+bool Category::empty() const {
     if (this -> items.size() == 0) {
         return true;
     }
@@ -106,7 +106,7 @@ std::vector<Item> Category::getAllItems() const {
 //  Category cObj{"categoryIdent"};
 //  Item iObj{"itemIdent"};
 //  cObj.addItem(iObj);
-bool Category::addItem(Item newItem) {
+bool Category::addItem(const Item newItem) {
     for (auto itr = items.begin(); itr != items.end(); ++itr) {
         if(itr -> getIdent() == newItem.getIdent()) {
             if (*itr == newItem) {
@@ -154,7 +154,7 @@ Item Category::getItem(std::string itemIdent) const {
 //  Category cObj{"categoryIdent"};
 //  cObj.newItem("itemIdent");
 //  bool result = cObj.deleteItem("itemIdent");
-bool Category::deleteItem(std::string itemIdent) {
+bool Category::deleteItem(const std::string itemIdent) {
     for (auto itr = items.begin(); itr != items.end(); ++itr) {
         if(itr -> getIdent() == itemIdent) {
             itr = items.erase(itr);

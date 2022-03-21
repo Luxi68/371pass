@@ -646,7 +646,7 @@ std::string App::getJSON(Wallet &wObj, const std::string &c,
 
 // This function takes in a string and the requested delimiter and returns
 // the result in a vector
-std::vector<std::string> App::splitStr(std::string str, const char delim) {
+std::vector<std::string> App::splitStr(const std::string str, const char delim) {
 	std::stringstream sstr(str);
 	std::vector<std::string> output;
 

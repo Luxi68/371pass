@@ -35,7 +35,7 @@ Item::~Item() {
 // Example:
 //  Item iObj{"identIdent"};
 //  auto size = iObj.size();
-unsigned int Item::size() {
+unsigned int Item::size() const {
     return this -> entries.size();
 }
 
@@ -45,7 +45,7 @@ unsigned int Item::size() {
 // Example:
 //  Item iObj{"identIdent"};
 //  auto empty = iObj.empty();
-bool Item::empty() {
+bool Item::empty() const {
     if (this -> entries.size() == 0) {
         return true;
     }
@@ -90,7 +90,7 @@ std::map<std::string, std::string> Item::getAllEntries() const {
 // Example:
 //  Item iObj{"identIdent"};
 //  iObj.addEntry("key", "value");
-bool Item::addEntry(std::string key, std::string value) {
+bool Item::addEntry(const std::string key, const std::string value) {
     bool isFound = false;
     auto itr = this -> entries.find(key);
 
@@ -131,7 +131,7 @@ std::string Item::getEntry(std::string key) const {
 //  Item iObj{"identIdent"};
 //  iObj.addEntry("key", "value");
 //  iObj.deleteEntry("key");
-bool Item::deleteEntry(std::string key) {
+bool Item::deleteEntry(const std::string key) {
     auto itr = this -> entries.find(key);
 
     if (itr != this -> entries.end()) {

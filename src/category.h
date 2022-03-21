@@ -26,16 +26,16 @@ class Category {
         Category(const std::string ident, const std::size_t size);
         ~Category();
 
-        unsigned int size();
-        bool empty();
+        unsigned int size() const;
+        bool empty() const;
 
         std::string getIdent() const;
         void setIdent(const std::string newIdent);
         std::vector<Item> getAllItems() const;
 
-        bool addItem(Item item);
+        bool addItem(const Item item);
         Item getItem(std::string itemIdent) const;
-        bool deleteItem(std::string itemIdent);
+        bool deleteItem(const std::string itemIdent);
 
         void mergeCategory(const Category Category);
         friend bool operator==(const Category category1, const Category category2);

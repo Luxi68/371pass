@@ -27,16 +27,16 @@ class Item {
         Item(const std::string ident);
         ~Item();
 
-        unsigned int size();
-        bool empty();
+        unsigned int size() const;
+        bool empty() const;
         
         void setIdent(const std::string newIdent);
         std::string getIdent() const;
         std::map<std::string, std::string> getAllEntries() const;
         
-        bool addEntry(std::string key, std::string value);
+        bool addEntry(const std::string key, const std::string value);
         std::string getEntry(std::string key) const;
-        bool deleteEntry(std::string key);
+        bool deleteEntry(const std::string key);
 
         void mergeItem(const Item item);
         friend bool operator==(const Item item1, const Item item2);

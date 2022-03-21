@@ -25,17 +25,17 @@ class Wallet {
         Wallet();
         ~Wallet();
 
-        unsigned int size();
-        bool empty();
+        unsigned int size() const;
+        bool empty() const;
 
         // Category &newCategory(const std::string categoryIdent);
-        bool addCategory(Category category);
+        bool addCategory(const Category category);
         Category getCategory(std::string categoryIdent) const;
-        bool deleteCategory(std::string categoryIdent);
+        bool deleteCategory(const std::string categoryIdent);
 
         void load(const std::string filename);
         std::string str() const;
-        void save(std::string filepath) const;
+        void save(const std::string filepath) const;
 };
 
 #endif // WALLET_H

@@ -36,7 +36,7 @@ Wallet::~Wallet() {
 // Example:
 //  Wallet wObj{};
 //  auto size = wObj.size();
-unsigned int Wallet::size() {
+unsigned int Wallet::size() const {
     return this -> categories.size();
 }
 
@@ -46,7 +46,7 @@ unsigned int Wallet::size() {
 // Example:
 //  Wallet wwObj{};
 //  auto isEmpty = wObj.empty();
-bool Wallet::empty() {
+bool Wallet::empty() const {
     if (this -> categories.size() == 0) {
         return true;
     }
@@ -74,7 +74,7 @@ bool Wallet::empty() {
 //  Wallet wObj{};
 //  Category cObj{"categoryIdent"};
 //  wObj.addCategory(cObj);
-bool Wallet::addCategory(Category newCategory) {
+bool Wallet::addCategory(const Category newCategory) {
     for(auto itr = categories.begin(); itr != categories.end(); ++itr) {
         if(itr -> getIdent() == newCategory.getIdent()) {
             if (*itr == newCategory) {
@@ -126,7 +126,7 @@ Category Wallet::getCategory(std::string categoryIdent) const {
 //  Wallet wObj{};
 //  wObj.newCategory("categoryIdent");
 //  wObj.deleteCategory("categoryIdent");
-bool Wallet::deleteCategory(std::string categoryIdent) {
+bool Wallet::deleteCategory(const std::string categoryIdent) {
     for (auto const& category : categories) {
         if(category.getIdent() == categoryIdent) {
             categories.remove(category);
@@ -230,7 +230,7 @@ void Wallet::load(const std::string filename){
 //  wObj.load("database.json");
 //  ...
 //  wObj.save("database.json");
-void Wallet::save(std::string filepath) const {
+void Wallet::save(const std::string filepath) const {
     nlohmann::json jsonFile;
 
     jsonFile = nlohmann::json::parse(this -> str());
