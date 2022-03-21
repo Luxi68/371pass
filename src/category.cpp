@@ -8,12 +8,10 @@
 // -----------------------------------------------------
 
 #include <algorithm>
-#include <string>
-#include <vector>
-#include <stdexcept>
 #include <sstream>
+#include <string>
+#include <stdexcept>
 
-#include "item.h"
 #include "category.h"
 
 // TODO Write a constructor that takes one parameter, a string identifier
