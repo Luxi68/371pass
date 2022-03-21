@@ -10,7 +10,6 @@
 #include <string>
 #include <map>
 #include <sstream>
-#include <iostream>
 
 #include "item.h"
 
@@ -22,12 +21,9 @@
 Item::Item(const std::string ident) {
     this -> ident = ident;
     std::map<std::string, std::string> entries;
-    // std::cout << "Constructed Item... " << ident << std::endl;
 }
 
-Item::~Item() {
-    // std::cout << "Destructed Item... " << ident << std::endl;
-}
+Item::~Item() {}
 
 // TODO Write a function, size, that takes no parameters and returns an unsigned
 //  int of the number of entries in the Item contains.
@@ -99,13 +95,11 @@ bool Item::addEntry(const std::string key, const std::string value) {
     auto itr = this -> entries.find(key);
 
     if (itr != this -> entries.end()) {
-        // std::cout << key << " old entry has been errased" << std::endl;
         entries.erase(key);
         isFound = true;
     }
 
     this -> entries.insert (std::pair<std::string, std::string>(key, value));
-    // std::cout << key << " new entry has been added to " << this -> getIdent() << std::endl;
     return !isFound;
 }
 
@@ -140,7 +134,6 @@ bool Item::deleteEntry(const std::string key) {
 
     if (itr != this -> entries.end()) {
         this -> entries.erase(itr);
-        // std::cout << key << " has been deleted from " << this -> ident << std::endl;
         return true;
     } else {
         throw std::out_of_range("deleteEntry failed, no entry found for key: " + key);

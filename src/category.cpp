@@ -12,7 +12,6 @@
 #include <vector>
 #include <stdexcept>
 #include <sstream>
-#include <iostream>
 
 #include "item.h"
 #include "category.h"
@@ -25,7 +24,6 @@
 Category::Category(const std::string ident) {
     this -> ident = ident;
     std::vector<Item> items;
-    // std::cout << "Constructed Category... " << ident << std::endl;
 }
 
 // A constructor which initialialises the object and member data,
@@ -37,12 +35,9 @@ Category::Category(const std::string ident, const std::size_t size) {
     this -> ident = ident;
     std::vector<Item> items;
     items.reserve(size);
-    // std::cout << "Constructed Category with size... " << ident << std::endl;
 }
 
-Category::~Category() {
-    // std::cout << "Destructed Category... " << ident << std::endl;
-}
+Category::~Category() {}
 
 // TODO Write a function, size, that takes no parameters and returns an unsigned
 //  int of the number of Items in the Category contains.
@@ -123,13 +118,11 @@ bool Category::addItem(const Item newItem) {
             }
 
             itr -> mergeItem(newItem);
-            // std::cout << newItem.getIdent() << " new item merged with old" << std::endl;
             return false;
         }
     }
 
     items.push_back(newItem);
-    // std::cout << newItem.getIdent() << " new item has been added to " << this -> getIdent() << std::endl;
     return true;
 }
 
@@ -148,7 +141,6 @@ Item Category::getItem(std::string itemIdent) const {
     for (auto const& item : items) {
         if(item.getIdent() == itemIdent) {
             return item;
-            // std::cout << itemIdent << " has been gotten from " << this -> getIdent() << std::endl;
         }
     }
 
@@ -167,7 +159,6 @@ bool Category::deleteItem(const std::string itemIdent) {
     for (auto itr = items.begin(); itr != items.end(); ++itr) {
         if(itr -> getIdent() == itemIdent) {
             itr = items.erase(itr);
-            // std::cout << itemIdent << " has been erased from " << this -> ident << std::endl;
             return true;
         }
     }

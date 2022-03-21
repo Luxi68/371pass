@@ -7,7 +7,6 @@
 // Canvas: https://canvas.swansea.ac.uk/courses/24793
 // -----------------------------------------------------
 
-#include <iostream>
 #include <fstream>
 #include <sstream>
 
@@ -23,12 +22,9 @@
 //  Wallet wObj{};
 Wallet::Wallet() {
     std::list<Category> categories;
-    // std::cout << "Constructed Wallet..." << std::endl;
 }
 
-Wallet::~Wallet() {
-    // std::cout << "Destructed Wallet..." << std::endl;
-}
+Wallet::~Wallet() {}
 
 // TODO Write a function, size, that takes no parameters and returns an unsigned
 //  int of the number of categories in the Wallet contains.
@@ -82,14 +78,12 @@ bool Wallet::addCategory(const Category newCategory) {
             }
 
             itr -> mergeCategory(newCategory);
-            // std::cout << newCategory.getIdent() << " new category merged with old" << std::endl;
             return false;
         }
     }
 
     try {
         categories.push_back(newCategory);
-        // std::cout << newCategory.getIdent() << " new category has been added to wallet" << std::endl;
         return true;
 
     } catch (std::length_error const&) { 
@@ -109,7 +103,6 @@ Category Wallet::getCategory(std::string categoryIdent) const {
     for (auto const& category : categories) {
         if(category.getIdent() == categoryIdent) {
             return category;
-            // std::cout << categoryIdent << " has been gotten" << std::endl;
         }
     }
 
@@ -130,7 +123,6 @@ bool Wallet::deleteCategory(const std::string categoryIdent) {
     for (auto const& category : categories) {
         if(category.getIdent() == categoryIdent) {
             categories.remove(category);
-            // std::cout << categoryIdent << " has been erased from wallet" << std::endl;
             return true;
         }
     }
