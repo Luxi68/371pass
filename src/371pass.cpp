@@ -116,7 +116,7 @@ int App::run(int argc, char *argv[]) {
 			Category cObj{category};
 			Item iObj{item};
 
-			if(entry.size() == 2) { //expected output
+			if(entry.size() == 2 && entry[1] != "") { //expected output
 				iObj.addEntry(entry.at(0), entry.at(1));
 			} else if (entry.size() == 1) { //if entry is missing value
 				iObj.addEntry(entry.at(0), "");
@@ -173,7 +173,153 @@ int App::run(int argc, char *argv[]) {
 		break;
 
 	case Action::UPDATE:
-		throw std::runtime_error("update not implemented");
+		switch (o) {
+		case Objs::NONE:
+			std::cerr << "Error: missing category, item or entry argument(s)." << std::endl;
+			return 1;
+		
+		case Objs::CATEGORY: {
+			const auto category = splitStr((args["category"].as<std::string>()), ':');
+
+			if(category.size() == 2 && category[1] != "") { //expected output
+				try {
+					Category tempCategory = wObj.getCategory(category[0]);
+					tempCategory.setIdent(category[1]);
+				
+					wObj.deleteCategory(category[0]);
+					wObj.addCategory(tempCategory);
+				} catch (std::out_of_range const&) {
+					std::cerr << "Error: invalid category argument(s)." << std::endl;
+					return 1;
+				}
+			} else {
+				std::cerr << "Error: invalid category argument(s)." << std::endl;
+				return 1;
+			}
+
+			wObj.save(db);
+			break;
+		}
+		case Objs::ITEM: {
+			const std::string category = args["category"].as<std::string>();
+			const auto item = splitStr((args["item"].as<std::string>()), ':');
+
+			if(item.size() == 2 && item[1] != "") { //expected output
+				try {
+					Category tempCategory = wObj.getCategory(category);
+					Item tempItem = tempCategory.getItem(item[0]);
+					tempItem.setIdent(item[1]);
+
+					tempCategory.deleteItem(item[0]);
+					tempCategory.addItem(tempItem);
+					wObj.deleteCategory(category);
+					wObj.addCategory(tempCategory);
+				} catch (std::out_of_range const&) {
+					std::cerr << "Error: invalid category or item argument(s)." << std::endl;
+					return 1;
+				}
+			} else {
+				std::cerr << "Error: invalid item argument(s)." << std::endl;
+				return 1;
+			}
+
+			wObj.save(db);
+			break;
+		}
+		case Objs::ENTRY: {
+			const std::string category = args["category"].as<std::string>();
+			const std::string item = args["item"].as<std::string>();
+			const std::string tempEntry = args["entry"].as<std::string>();
+
+			if (tempEntry.find(':') != std::string::npos) { //Found ':'
+				if (tempEntry.find(',') == std::string::npos) { //notFound ','
+					const auto entry = splitStr((args["entry"].as<std::string>()), ':');
+					
+					if(entry.size() == 2 && entry[1] != "") {
+						try {
+							// Create temporary objects to edit
+							Category tempCategory = wObj.getCategory(category);
+							Item tempItem = tempCategory.getItem(item);
+							std::string value = tempItem.getEntry(entry[0]);
+							tempItem.deleteEntry(entry[0]);
+							tempItem.addEntry(entry[1], value);
+							// Replace old objects with edited objects
+							tempCategory.deleteItem(item);
+							tempCategory.addItem(tempItem);
+							wObj.deleteCategory(category);
+							wObj.addCategory(tempCategory);
+						} catch (std::out_of_range const&) {
+							std::cerr << "Error: invalid category, item or entry argument(s)." 
+								<< std::endl;
+							return 1;
+						}
+					} else {
+						std::cerr << "Error: invalid entry argument(s)." << std::endl;
+						return 1;
+					}
+
+				} else { //Found ','
+					const auto entryOldKey = splitStr((args["entry"].as<std::string>()), ':');
+					const auto entryKeyValue = splitStr((entryOldKey[1]), ',');
+					
+					if(entryOldKey.size() == 2 && entryKeyValue.size() == 2 ) {
+						try {
+							// Create temporary objects to edit
+							Category tempCategory = wObj.getCategory(category);
+							Item tempItem = tempCategory.getItem(item);
+							tempItem.deleteEntry(entryOldKey[0]);
+							tempItem.addEntry(entryKeyValue[0], entryKeyValue[1]);
+							// Replace old objects with edited objects
+							tempCategory.deleteItem(item);
+							tempCategory.addItem(tempItem);
+							wObj.deleteCategory(category);
+							wObj.addCategory(tempCategory);
+						} catch (std::out_of_range const&) {
+							std::cerr << "Error: invalid category, item or entry argument(s)." 
+								<< std::endl;
+							return 1;
+						}
+					} else {
+						std::cerr << "Error: invalid entry argument(s)." << std::endl;
+						return 1;
+					}
+				}
+			} else { //notFound ':'
+				if (tempEntry.find(',') != std::string::npos) { //found ','
+					const auto entry = splitStr((args["entry"].as<std::string>()), ',');
+					
+					if(entry.size() == 2 && entry[1] != "") {
+						try {
+							// Create temporary objects to edit
+							Category tempCategory = wObj.getCategory(category);
+							Item tempItem = tempCategory.getItem(item);
+							tempItem.addEntry(entry[0], entry[1]);
+							// Replace old objects with edited objects
+							tempCategory.deleteItem(item);
+							tempCategory.addItem(tempItem);
+							wObj.deleteCategory(category);
+							wObj.addCategory(tempCategory);
+						} catch (std::out_of_range const&) {
+							std::cerr << "Error: invalid category, item or entry argument(s)." 
+								<< std::endl;
+							return 1;
+						}
+					} else {
+						std::cerr << "Error: invalid entry argument(s)." << std::endl;
+						return 1;
+					}
+				} else { //notFound ','
+					std::cerr << "Error: invalid entry argument(s)." << std::endl;
+					return 1;
+				}
+			}
+			wObj.save(db);
+			break;
+		}
+		default:
+			std::cerr << "Error: unexpected arguments for update action." << std::endl;
+			return 1;
+		}
 		break;
 
 	case Action::DELETE:
@@ -200,9 +346,10 @@ int App::run(int argc, char *argv[]) {
 			const std::string item = args["item"].as<std::string>();
 
 			try {
+				// Create temporary objects to edit
 				Category tempCategory = wObj.getCategory(category);
 				tempCategory.deleteItem(item);
-			
+				// Replace old objects with edited objects
 				wObj.deleteCategory(category);
 				wObj.addCategory(tempCategory);
 			} catch(std::out_of_range const&) {
@@ -219,10 +366,11 @@ int App::run(int argc, char *argv[]) {
 			const std::string entry = args["entry"].as<std::string>();
 			
 			try {
+				// Create temporary objects to edit
 				Category tempCategory = wObj.getCategory(category);
 				Item tempItem = tempCategory.getItem(item);
 				tempItem.deleteEntry(entry);
-
+				// Replace old objects with edited objects
 				tempCategory.deleteItem(item);
 				tempCategory.addItem(tempItem);
 				wObj.deleteCategory(category);

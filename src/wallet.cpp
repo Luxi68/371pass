@@ -62,6 +62,7 @@ bool Wallet::empty() {
 // Example:
 //  Wallet wObj{};
 //  wObj.newCategory("categoryIdent");
+// Category &Wallet::newCategory(const std::string categoryIdent) {} 
 
 // TODO Write a function, addCategory, that takes one parameter, a Category
 //  object, and returns true if the object was successfully inserted. If an

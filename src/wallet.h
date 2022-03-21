@@ -28,6 +28,7 @@ class Wallet {
         unsigned int size();
         bool empty();
 
+        // Category &newCategory(const std::string categoryIdent);
         bool addCategory(Category category);
         Category getCategory(std::string categoryIdent) const;
         bool deleteCategory(std::string categoryIdent);

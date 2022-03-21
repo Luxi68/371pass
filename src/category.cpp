@@ -78,6 +78,14 @@ std::string Category::getIdent() const {
 // Example:
 //  Category cObj{"categoryIdent"};
 //  cObj.setIdent("categoryIdent2");
+void Category::setIdent(const std::string newIdent) {
+    this -> ident = newIdent;
+}
+
+// Return the vector of items.
+std::vector<Item> Category::getAllItems() const {
+    return this -> items;
+}
 
 // TODO Write a function, newItem, that takes one parameter, an Item identifier,
 //  (a string) and returns the Item object as a reference. If an object with the
@@ -88,11 +96,6 @@ std::string Category::getIdent() const {
 // Example:
 //  Category cObj{"categoryIdent"};
 //  cObj.newItem("itemIdent");
-
-// Return the vector of items.
-std::vector<Item> Category::getAllItems() const {
-    return this -> items;
-}
 
 // TODO Write a function, addItem, that takes one parameter, an Item object,
 //  and returns true if the object was successfully inserted. If an object with

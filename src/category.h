@@ -30,6 +30,7 @@ class Category {
         bool empty();
 
         std::string getIdent() const;
+        void setIdent(const std::string newIdent);
         std::vector<Item> getAllItems() const;
 
         bool addItem(Item item);

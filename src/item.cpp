@@ -58,6 +58,9 @@ bool Item::empty() {
 // Example:
 //  Item iObj{"identIdent"};
 //  iObj.setIdent("identIdent2");
+void Item::setIdent(const std::string newIdent) {
+    this -> ident = newIdent;
+}
 
 // TODO Write a function, getIdent, that returns the identifier for the Item.
 //
