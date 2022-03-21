@@ -75,9 +75,8 @@ int App::run(int argc, char *argv[]) {
 		case Modify::CATEGORY: { //trying to create category
 			const std::string category = args["category"].as<std::string>();
 
-			Category cObj{category};
 			try {
-				wObj.addCategory(cObj);
+				wObj.newCategory(category);
 			} catch (std::runtime_error const&) {
 				std::cerr << "Error: failed to insert category " << category << " into wallet." << std::endl;
 				return 1;
@@ -91,10 +90,9 @@ int App::run(int argc, char *argv[]) {
 			const std::string item = args["item"].as<std::string>();
 
 			Category cObj{category};
-			Item iObj{item};
 
-			cObj.addItem(iObj);
 			try {
+				cObj.newItem(item);
 				wObj.addCategory(cObj);
 			} catch (std::runtime_error const&) {
 				std::cerr << "Error: failed to insert category " << category << " into wallet." << std::endl;
