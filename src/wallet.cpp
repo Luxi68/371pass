@@ -70,7 +70,7 @@ Category &Wallet::newCategory(const std::string categoryIdent) {
     try {
         categories.push_back(cObj);
     } catch (std::length_error const&) { 
-        throw std::runtime_error("Could not create new item: " + categoryIdent);
+        throw std::runtime_error("Could not create new category: " + categoryIdent);
     }
     
     return cObjRef;
