@@ -200,15 +200,13 @@ int App::run(int argc, char *argv[]) {
 			const std::string item = args["item"].as<std::string>();
 
 			try {
-				Category cObj = wObj.getCategory(category);
-				try {
-					cObj.deleteItem(item);
-				} catch (std::out_of_range const&) {
-					std::cerr << "Error: invalid item argument(s)." << std::endl;
-					return 1;
-				}
+				Category tempCategory = wObj.getCategory(category);
+				tempCategory.deleteItem(item);
+			
+				wObj.deleteCategory(category);
+				wObj.addCategory(tempCategory);
 			} catch(std::out_of_range const&) {
-				std::cerr << "Error: invalid category argument(s)." << std::endl;
+				std::cerr << "Error: invalid category or item argument(s)." << std::endl;
 				return 1;
 			}
 
@@ -221,21 +219,16 @@ int App::run(int argc, char *argv[]) {
 			const std::string entry = args["entry"].as<std::string>();
 			
 			try {
-				const Category cObj = wObj.getCategory(category);
-				try {
-					Item iObj = cObj.getItem(item);
-					try {
-						iObj.deleteEntry(entry);
-					} catch(std::out_of_range const&) {
-						std::cerr << "Error: invalid entry argument(s)." << std::endl;
-						return 1;
-					}
-				} catch (std::out_of_range const&) {
-					std::cerr << "Error: invalid item argument(s)." << std::endl;
-					return 1;
-				}
+				Category tempCategory = wObj.getCategory(category);
+				Item tempItem = tempCategory.getItem(item);
+				tempItem.deleteEntry(entry);
+
+				tempCategory.deleteItem(item);
+				tempCategory.addItem(tempItem);
+				wObj.deleteCategory(category);
+				wObj.addCategory(tempCategory);
 			} catch(std::out_of_range const&) {
-				std::cerr << "Error: invalid category argument(s)." << std::endl;
+				std::cerr << "Error: invalid category, item or entey argument(s)." << std::endl;
 				return 1;
 			}
 
